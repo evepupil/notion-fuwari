@@ -32,11 +32,20 @@ if (!process.env.VERCEL && !process.env.CI) {
 }
 
 // 同步模式（从命令行参数获取）
-// --mode=overwrite : 强制覆盖所有文章（默认）
-// --mode=new-only  : 仅添加新文章，不覆盖已存在的
+// --mode=overwrite : 完全同步，删除本地 Notion 中不存在的文章（默认）
+// --mode=new-only  : 仅新增，不覆盖已存在的文章，不删除旧文章
+// --mode=append    : 纯增量，添加新文章并更新已有文章，不删除旧文章
 const args = process.argv.slice(2);
 const modeArg = args.find(arg => arg.startsWith('--mode='));
 const SYNC_MODE = modeArg ? modeArg.split('=')[1] : 'overwrite';
+
+// 验证同步模式
+const VALID_MODES = ['overwrite', 'new-only', 'append'];
+if (!VALID_MODES.includes(SYNC_MODE)) {
+  console.error(`❌ 错误: 无效的同步模式 "${SYNC_MODE}"`);
+  console.error(`可用模式: ${VALID_MODES.join(', ')}`);
+  process.exit(1);
+}
 
 // 配置
 const CONFIG = {
@@ -304,6 +313,7 @@ ${categoryLine}---
   // 检查文件是否已存在
   if (fs.existsSync(filepath)) {
     if (CONFIG.syncMode === 'new-only') {
+      // new-only 模式：跳过已存在的文件
       console.log(`  ⏭️  跳过（已存在）: ${filename}`);
       return {
         title,
@@ -312,8 +322,12 @@ ${categoryLine}---
         tags,
         skipped: true,
       };
-    } else {
+    } else if (CONFIG.syncMode === 'overwrite') {
+      // overwrite 模式：覆盖已存在的文件
       console.log(`  🔄 覆盖已存在的文件`);
+    } else if (CONFIG.syncMode === 'append') {
+      // append 模式：更新已存在的文件
+      console.log(`  ♻️  更新已存在的文件`);
     }
   }
 
@@ -336,7 +350,12 @@ async function main() {
   console.log('🚀 Notion 博客同步脚本\n');
 
   // 显示同步模式
-  const modeText = CONFIG.syncMode === 'new-only' ? '仅新增（不覆盖已存在文章）' : '强制覆盖';
+  const modeDescriptions = {
+    'overwrite': '完全同步（删除本地 Notion 中不存在的文章）',
+    'new-only': '仅新增（不覆盖已存在文章，不删除旧文章）',
+    'append': '纯增量（添加新文章并更新已有文章，不删除旧文章）'
+  };
+  const modeText = modeDescriptions[CONFIG.syncMode] || CONFIG.syncMode;
   console.log(`同步模式: ${modeText}`);
 
   console.log('\n配置信息:');
@@ -368,6 +387,39 @@ async function main() {
       }
     }
 
+    // overwrite 模式：清理本地多余的文章
+    let deletedCount = 0;
+    if (CONFIG.syncMode === 'overwrite') {
+      console.log('\n🗑️  清理本地多余的文章...');
+
+      // 获取 Notion 中所有文章的 slug 列表
+      const notionSlugs = results.map(r => r.slug);
+
+      // 获取本地所有 .md 文件
+      const localFiles = fs.readdirSync(CONFIG.contentDir).filter(file => file.endsWith('.md'));
+
+      // 找出本地存在但 Notion 中不存在的文章
+      for (const file of localFiles) {
+        const slug = file.replace('.md', '');
+        if (!notionSlugs.includes(slug)) {
+          const filepath = path.join(CONFIG.contentDir, file);
+          try {
+            fs.unlinkSync(filepath);
+            deletedCount++;
+            console.log(`  🗑️  已删除: ${file}`);
+          } catch (error) {
+            console.error(`  ❌ 删除失败: ${file} - ${error.message}`);
+          }
+        }
+      }
+
+      if (deletedCount === 0) {
+        console.log('  ✅ 没有需要清理的文章');
+      } else {
+        console.log(`  ✅ 已清理 ${deletedCount} 篇多余文章`);
+      }
+    }
+
     // 输出统计信息
     console.log('\n' + '='.repeat(60));
     console.log('✅ 同步完成!');
@@ -378,9 +430,24 @@ async function main() {
     const skippedCount = results.filter(r => r.skipped).length;
     const newCount = results.filter(r => !r.skipped).length;
 
-    if (CONFIG.syncMode === 'new-only' && skippedCount > 0) {
-      console.log(`  - 跳过（已存在）: ${skippedCount} 篇`);
-      console.log(`  - 新增: ${newCount} 篇`);
+    // 根据模式显示不同的统计信息
+    if (CONFIG.syncMode === 'overwrite') {
+      console.log(`  - 覆盖/更新: ${newCount} 篇`);
+      if (deletedCount > 0) {
+        console.log(`  - 已删除: ${deletedCount} 篇`);
+      }
+    } else if (CONFIG.syncMode === 'new-only') {
+      if (skippedCount > 0) {
+        console.log(`  - 跳过（已存在）: ${skippedCount} 篇`);
+      }
+      if (newCount > 0) {
+        console.log(`  - 新增: ${newCount} 篇`);
+      }
+    } else if (CONFIG.syncMode === 'append') {
+      console.log(`  - 新增/更新: ${newCount} 篇`);
+      if (skippedCount > 0) {
+        console.log(`  - 跳过: ${skippedCount} 篇`);
+      }
     }
 
     if (results.length > 0) {
@@ -397,8 +464,12 @@ async function main() {
     console.log('  3. 运行 pnpm build 构建生产版本');
 
     console.log('\n💡 同步模式说明:');
-    console.log('  - 强制覆盖: pnpm sync-notion (默认)');
-    console.log('  - 仅新增: pnpm sync-notion -- --mode=new-only\n');
+    console.log('  - overwrite（默认）: pnpm sync-notion');
+    console.log('    完全同步，删除本地 Notion 中不存在的文章');
+    console.log('  - new-only: pnpm sync-notion -- --mode=new-only');
+    console.log('    仅新增，不覆盖已存在的文章，不删除旧文章');
+    console.log('  - append: pnpm sync-notion -- --mode=append');
+    console.log('    纯增量，添加新文章并更新已有文章，不删除旧文章\n');
 
   } catch (error) {
     console.error('\n❌ 同步失败:', error.message);

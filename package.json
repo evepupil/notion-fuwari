@@ -13,6 +13,7 @@
 		"clean": "node scripts/clean-unused-images.js",
 		"sync-notion": "node scripts/sync-from-notion.js",
 		"sync-notion:new": "node scripts/sync-from-notion.js --mode=new-only",
+		"sync-notion:append": "node scripts/sync-from-notion.js --mode=append",
 		"format": "biome format --write ./src",
 		"lint": "biome check --write ./src"
 	},

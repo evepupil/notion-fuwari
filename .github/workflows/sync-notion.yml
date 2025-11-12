@@ -41,6 +41,7 @@ jobs:
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          NOTION_FRIEND_LINK_DATABASE_ID: ${{ secrets.NOTION_FRIEND_LINK_DATABASE_ID }}
         run: pnpm sync-notion && pnpm sync-friends
 
       # 6. 提交并推送更改

@@ -17,6 +17,7 @@
 - 📡 RSS 订阅支持
 - **🔄 Notion 同步集成** - 从 Notion 一键同步文章到博客（新增）
 - **🖼️ 智能图片管理** - 自动下载并按文章分类存储图片（新增）
+- **🔗 友链管理系统** - 支持用户提交友链申请，管理员在 Notion 审核（新增）
 
 ## 🛠️ 技术栈
 
@@ -76,6 +77,7 @@ pnpm preview
    ```env
    NOTION_TOKEN=your_notion_integration_token
    NOTION_DATABASE_ID=your_database_id
+   NOTION_FRIEND_LINK_DATABASE_ID=your_friend_link_database_id  # 可选，用于友链管理
    ```
 
    详细配置步骤请参考 `scripts/README-NOTION-SYNC.md`
@@ -134,6 +136,25 @@ src/content/assets/images/
 ```bash
 pnpm clean
 ```
+
+### 友链管理
+
+#### 用户提交友链
+
+访问 `/friends` 页面，点击"点击这里提交"按钮，填写友链信息提交申请。申请会自动保存到 Notion 数据库，状态为"待审核"。
+
+#### 管理员审核友链
+
+1. 在 Notion 友链数据库中查看申请
+2. 审核通过后将状态改为"已通过"
+3. 执行同步命令将已通过的友链同步到博客：
+   ```bash
+   pnpm sync-friends
+   ```
+
+#### 自动同步
+
+配置 `NOTION_FRIEND_LINK_DATABASE_ID` 后，GitHub Actions 会自动同步友链（需在仓库 Secrets 中配置）。
 
 ### 配置博客
 
@@ -200,7 +221,8 @@ draft: false
 ├── scripts/               # 脚本工具
 │   ├── new-post.js        # 创建新文章
 │   ├── clean-unused-images.js  # 清理未使用图片
-│   ├── sync-from-notion.js     # Notion 同步（新增）
+│   ├── sync-from-notion.js     # Notion 文章同步（新增）
+│   ├── sync-friends-from-notion.js  # Notion 友链同步（新增）
 │   └── README-NOTION-SYNC.md   # Notion 同步文档（新增）
 ├── .env.local.example     # 环境变量示例（新增）
 └── package.json
@@ -278,7 +300,8 @@ jobs:
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
-        run: pnpm sync-notion
+          NOTION_FRIEND_LINK_DATABASE_ID: ${{ secrets.NOTION_FRIEND_LINK_DATABASE_ID }}
+        run: pnpm sync-notion && pnpm sync-friends
 
       - name: Build
         run: pnpm build
@@ -289,7 +312,12 @@ jobs:
 
 构建后的静态文件位于 `dist/` 目录，可部署到任何静态托管平台。
 
-**Vercel 部署提示**：在 Vercel 项目设置中添加环境变量 `NOTION_TOKEN` 和 `NOTION_DATABASE_ID`
+**Vercel 部署提示**：
+- 在 Vercel 项目设置中添加环境变量：
+  - `NOTION_TOKEN`
+  - `NOTION_DATABASE_ID`
+  - `NOTION_FRIEND_LINK_DATABASE_ID`（可选，用于友链管理）
+- 配置 `output: "static"` + `adapter: vercel()` 支持 Serverless API（友链提交功能）
 
 ## 🆕 新增功能
 
@@ -336,6 +364,25 @@ src/content/assets/images/
 - 🔍 快速定位文章相关图片
 - 🗑️ 删除文章时可一并删除图片文件夹
 - 🚫 避免图片命名冲突
+
+### 友链管理系统
+
+基于 Notion 的友链管理系统，用户可在线提交友链申请，管理员在 Notion 审核。
+
+**功能特性**：
+- ✅ 用户在前端页面提交友链申请（Toast 通知）
+- ✅ 申请自动保存到 Notion 数据库，状态为"待审核"
+- ✅ 管理员在 Notion 中审核，修改状态为"已通过"或"已拒绝"
+- ✅ 执行 `pnpm sync-friends` 同步已通过的友链到博客
+- ✅ 支持 GitHub Actions 自动同步
+
+**Notion 数据库字段**：
+- 网站名称（Title）
+- 网站地址（URL）
+- 网站描述（Text）
+- 头像URL（URL）
+- 状态（Select：待审核/已通过/已拒绝）
+- 提交时间（Date）
 
 ## 🤝 贡献
 

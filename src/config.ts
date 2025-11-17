@@ -99,9 +99,9 @@ export const profileConfig: ProfileConfig = {
 	bio: "無くした日々にさよなら",
 	links: [
 		{
-			name: "Bilibli",
-			icon: "fa6-brands:bilibili",
-			url: "https://space.bilibili.com/15375082",
+			name: "知乎",
+			icon: "fa6-brands:zhihu",
+			url: "https://www.zhihu.com/people/ye-tong-95-79",
 		},
 		{
 			name: "GitHub",

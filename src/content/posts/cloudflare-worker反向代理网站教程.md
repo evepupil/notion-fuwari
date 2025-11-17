@@ -1,8 +1,8 @@
 ---
 title: 'Cloudflare Worker反向代理网站教程'
 published: 2025-11-17
-description: '```markdown'
-image: ''
+description: '反向代理就是**代替你访问目标网站**，然后把结果返回给你。比如你想访问 `example.com`，但你不想直接访问，而是通过 Cloudflare Worker 去访问，然后 Workers 再把内容返回给你。'
+image: '../assets/images/cloudflare-worker反向代理网站教程/cover.jpg'
 tags: ["cloud flare", "好玩", "serverless"]
 draft: false
 lang: ''
@@ -10,14 +10,14 @@ category: '技术'
 ---
 
 
-```markdown
-# Cloudflare Worker 反向代理入门教程
-
 ## 什么是反向代理？
+
 
 反向代理就是**代替你访问目标网站**，然后把结果返回给你。比如你想访问 `example.com`，但你不想直接访问，而是通过 Cloudflare Worker 去访问，然后 Workers 再把内容返回给你。
 
+
 **使用场景：**
+
 - 绕过地域限制
 - 隐藏真实服务器地址
 - 访问被墙的网站
@@ -25,21 +25,29 @@ category: '技术'
 
 ## 前置准备
 
-1. **Cloudflare 账号** - 免费注册 https://cloudflare.com
-2. **wrangler CLI 工具**
-   ```bash
-   npm install -g wrangler
-   ```
-3. **登录 wrangler**
-   ```bash
-   wrangler login
-   ```
+1. **Cloudflare 账号** - 免费注册 [https://cloudflare.com](https://cloudflare.com/)
+2. **wrangler CLI 工具** npm install -g wrangler
+3. **登录 wrangler** wrangler login
+
+## 示例项目（这里是代理了一个AI公益中转站）
+
+
+代码仓库：[https://github.com/evepupil/any-proxy](https://github.com/evepupil/any-proxy)
+
+
+体验代理站地址：[any.chaosyn.com](https://any.chaosyn.com/)
+
+
+注意：配置自定义域名才可以直连（否则不能直连）
+
 
 ## 完整代码示例
 
+
 创建一个文件 `worker.js`：
 
-```javascript
+
+```plain text
 /**
  * Cloudflare Worker 反向代理
  * 功能：代理 anyrouter.top 网站
@@ -125,95 +133,132 @@ async function handleRequest(request) {
 }
 ```
 
+
 ## 部署步骤
+
 
 ### 方法一：使用 CLI（推荐）
 
+
 **1. 初始化项目**
-```bash
+
+
+```plain text
 wrangler init any-proxy
 cd any-proxy
 ```
 
-**2. 创建配置文件 `wrangler.toml`**
-```toml
+
+**2. 创建配置文件** **`wrangler.toml`**
+
+
+```plain text
 name = "any-proxy"
 main = "worker.js"
 compatibility_date = "2024-01-01"
 workers_dev = true
 ```
 
+
 **3. 部署**
-```bash
+
+
+```plain text
 wrangler deploy
 ```
 
-**4. 获取访问地址**
-部署成功后会有类似输出：
-```
+
+**4. 获取访问地址** 部署成功后会有类似输出：
+
+
+```plain text
 Deployed any-proxy triggers (0.66 sec)
   https://any-proxy.your-subdomain.workers.dev
 ```
 
+
 这就是你的代理地址！
+
 
 ### 方法二：使用 Dashboard
 
 1. 登录 Cloudflare Dashboard
-2. 进入 "Workers & Pages"
-3. 点击 "Create application" → "Create Worker"
+2. 进入 “Workers & Pages”
+3. 点击 “Create application” → “Create Worker”
 4. 粘贴代码
-5. 点击 "Save and Deploy"
+5. 点击 “Save and Deploy”
 
 ## 绑定自定义域名
 
+
 **1. 在 Cloudflare 中添加域名**
+
 
 如果 `your-domain.com` 在 Cloudflare 管理：
 
-```bash
+
+```plain text
 # 添加路由到 wrangler.toml
 routes = [
   { pattern = "your-domain.com/*", zone_name = "your-domain.com" }
 ]
 ```
 
+
 **2. 重新部署**
-```bash
+
+
+```plain text
 wrangler deploy
 ```
 
+
 **3. DNS 设置**
+
 
 Cloudflare 会自动处理 DNS 记录，无需手动添加。
 
+
 ## 常见问题
 
-### ❌ 500 错误 - "Too many redirects"
+
+### ❌ 500 错误 - “Too many redirects”
+
 
 **原因：** 网站检测到代理，返回重定向，导致无限循环。
 
+
 **解决：** 设置 `redirect: 'manual'`，手动处理重定向（见上方代码第 22 行）。
+
 
 ### ❌ 静态资源 404
 
+
 **原因：** 网站内部链接使用绝对 URL，直接指向原域名。
+
 
 **解决：** 添加 URL 重写功能，将响应内容中的原域名替换为代理域名。
 
+
 ### ❌ CORS 错误
 
+
 **解决：** 在响应头中添加：
-```
+
+
+```plain text
 Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
 ```
 
+
 ## 进阶功能
+
 
 ### 1. URL 重写（让所有资源都通过代理）
 
-```javascript
+
+```plain text
 // 在响应处理时添加
 const contentType = response.headers.get('content-type') || '';
 
@@ -232,9 +277,11 @@ if (contentType.includes('text/html') ||
 }
 ```
 
+
 ### 2. 添加缓存
 
-```javascript
+
+```plain text
 // 缓存静态资源 1 小时
 const cacheKey = new Request(url, request);
 const cache = caches.default;
@@ -247,30 +294,35 @@ if (!response) {
 }
 ```
 
+
 ## 完整项目结构
 
-```
+
+```plain text
 my-proxy/
 ├── worker.js          # 主程序
 ├── wrangler.toml      # 配置文件
 └── package.json       # 依赖（可选）
 ```
 
+
 ## 总结
 
 1. **核心原理**：拦截请求 → 转发到目标 → 修改响应 → 返回给用户
 2. **关键点**：
-   - 修改请求头（Host、Origin）
-   - 禁止自动重定向
-   - 添加 CORS 支持
-   - 处理 URL 重写
+    - 修改请求头（Host、Origin）
+    - 禁止自动重定向
+    - 添加 CORS 支持
+    - 处理 URL 重写
 3. **部署方式**：CLI 命令或 Dashboard 界面
 
 就这么简单！现在你可以在任何地方通过你的 Cloudflare Worker 访问目标网站了。
+
+
+![v2-683a9bd50c510a5be0bd0a22d71d0daf~resize:1440:q75.png](https://pic-out.zhimg.com/v2-683a9bd50c510a5be0bd0a22d71d0daf~resize:1440:q75.png?animatedImageAutoPlay=false&animatedImagePlayCount=1&auth_key=1763389800-0-0-3f607458cce2622cc6ece959199fc333&bizSceneCode=article_draft&expiration=1763389800&incremental=false&mid=d069498b8a955c3cdbf307c78b374d16&overTime=60&precoder=false&protocol=v2&retryCount=3&sampling=false&sceneCode=editor_copy_outbound&source=bfcaadb1)
+
 
 ## 参考资料
 
 - [Cloudflare Workers 官方文档](https://developers.cloudflare.com/workers/)
 - [wrangler CLI 文档](https://developers.cloudflare.com/workers/wrangler/)
-```
-

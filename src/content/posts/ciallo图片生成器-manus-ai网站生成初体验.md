@@ -1,6 +1,6 @@
 ---
 title: 'Ciallo图片生成器 — Manus AI网站生成初体验'
-published: 2025-11-17T03:52:35.101Z
+published: 2025-11-17T14:34:56.661Z
 description: '最近了解到manus搞了个免费万亿Token活动，在他们平台上面生成的网站中使用AI完全免费，于是注册了一个账号生成一个网站试试水~'
 image: '../assets/images/ciallo图片生成器-manus-ai网站生成初体验/cover.jpg'
 tags: ["好玩", "赛博整活", "AI"]

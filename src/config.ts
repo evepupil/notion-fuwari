@@ -26,7 +26,7 @@ export const siteConfig: SiteConfig = {
 	},
 	banner: {
 		enable: false,
-		src: "/xinghui.avif", // Relative to the /src directory. Relative to the /public directory if it starts with '/'
+		src: "/background/back.jpg", // Relative to the /src directory. Relative to the /public directory if it starts with '/'
 
 		position: "center", // Equivalent to object-position, only supports 'top', 'center', 'bottom'. 'center' by default
 		credit: {
@@ -174,8 +174,8 @@ export const analyticsConfig: AnalyticsConfig = {
 	},
 	// Google Analytics（原作者的配置，建议删除或替换）
 	googleAnalytics: {
-		enable: false,
-		measurementId: "G-9Z4LT4H8KH",
+		enable: true,
+		measurementId: "G-D9ZRKT7G85",
 	},
 	// Cloudflare Web Analytics（原作者的配置，建议删除或替换）
 	cloudflare: {

@@ -1,0 +1,125 @@
+---
+// 语言切换器组件
+import { Icon } from "astro-icon/components";
+import { locales, localeNames, getCurrentLocale, type Locale } from "@/i18n";
+
+const currentLocale = getCurrentLocale();
+---
+
+<div class="relative" id="lang-switcher">
+	<button
+		id="lang-btn"
+		class="btn-plain h-11 w-11 rounded-lg active:scale-90 flex items-center justify-center"
+		aria-label="Switch Language"
+	>
+		<Icon name="material-symbols:translate" class="text-[1.25rem]" />
+	</button>
+
+	<div
+		id="lang-menu"
+		class="hidden absolute right-0 top-full mt-2 py-2 w-32 rounded-lg bg-[var(--card-bg)] shadow-lg border border-[var(--line-divider)] z-50"
+	>
+		{locales.map((locale) => (
+			<button
+				class:list={[
+					"lang-option w-full px-4 py-2 text-left text-sm hover:bg-[var(--btn-plain-bg-hover)] transition",
+					locale === currentLocale && "text-[var(--primary)] font-medium"
+				]}
+				data-locale={locale}
+			>
+				{localeNames[locale]}
+			</button>
+		))}
+	</div>
+</div>
+
+<script>
+	function initLangSwitcher() {
+		const btn = document.getElementById('lang-btn');
+		const menu = document.getElementById('lang-menu');
+		const options = document.querySelectorAll('.lang-option');
+
+		if (!btn || !menu) return;
+
+		// 切换菜单显示
+		btn.addEventListener('click', (e) => {
+			e.stopPropagation();
+			menu.classList.toggle('hidden');
+		});
+
+		// 点击外部关闭菜单
+		document.addEventListener('click', () => {
+			menu.classList.add('hidden');
+		});
+
+		// 防止菜单内点击关闭
+		menu.addEventListener('click', (e) => {
+			e.stopPropagation();
+		});
+
+		// 语言选择
+		options.forEach((option) => {
+			option.addEventListener('click', () => {
+				const locale = (option as HTMLElement).dataset.locale;
+				if (!locale) return;
+
+				// 保存语言偏好
+				localStorage.setItem('preferred-locale', locale);
+
+				// 获取当前路径
+				const currentPath = window.location.pathname;
+
+				// 转换路径
+				let newPath = currentPath;
+
+				if (locale === 'zh-CN') {
+					// 切换到中文：移除语言前缀
+					// /posts/en/slug/ → /posts/slug/
+					newPath = currentPath.replace(/\/posts\/en\//, '/posts/');
+				} else {
+					// 切换到其他语言
+					if (currentPath.includes('/posts/') && !currentPath.includes('/posts/en/')) {
+						// /posts/slug/ → /posts/en/slug/
+						newPath = currentPath.replace('/posts/', `/posts/${locale}/`);
+					} else if (currentPath.includes('/posts/en/')) {
+						// 已经有语言前缀，替换
+						newPath = currentPath.replace('/posts/en/', `/posts/${locale}/`);
+					}
+				}
+
+				// 如果路径没变，可能是非文章页面，暂时只刷新
+				if (newPath !== currentPath) {
+					window.location.href = newPath;
+				} else {
+					// 非文章页面，刷新页面（未来可以扩展支持其他页面的多语言）
+					window.location.reload();
+				}
+
+				menu.classList.add('hidden');
+			});
+		});
+	}
+
+	// 初始化
+	initLangSwitcher();
+
+	// Astro View Transitions 支持
+	document.addEventListener('astro:after-swap', initLangSwitcher);
+</script>
+
+<style>
+	#lang-menu {
+		animation: fadeIn 0.15s ease-out;
+	}
+
+	@keyframes fadeIn {
+		from {
+			opacity: 0;
+			transform: translateY(-8px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+</style>

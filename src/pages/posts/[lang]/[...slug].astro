@@ -1,0 +1,163 @@
+---
+import path from "node:path";
+import License from "@components/misc/License.astro";
+import Markdown from "@components/misc/Markdown.astro";
+
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { getDir, getPostUrlBySlug } from "@utils/url-utils";
+import { Icon } from "astro-icon/components";
+import { getCollection } from "astro:content";
+import { gitHubEditConfig, licenseConfig } from "src/config";
+import PostMetadata from "../../../components/PostMeta.astro";
+import ImageWrapper from "../../../components/misc/ImageWrapper.astro";
+import { profileConfig, siteConfig } from "../../../config";
+import { formatDateToYYYYMMDD } from "../../../utils/date-utils";
+import { locales, defaultLocale, isValidLocale, t } from "../../../i18n";
+
+export async function getStaticPaths() {
+	const allPosts = await getCollection("posts", ({ data }) => {
+		return import.meta.env.PROD ? data.draft !== true : true;
+	});
+
+	const paths = [];
+
+	// 为每个非默认语言生成路径
+	for (const locale of locales) {
+		if (locale === defaultLocale) continue; // 默认语言使用 /posts/[...slug]
+
+		// 查找该语言的文章（通过文章的 lang 字段或文件路径）
+		const langPosts = allPosts.filter((post) => {
+			// 检查 frontmatter 中的 lang 字段
+			if (post.data.lang === locale || post.data.lang === locale.replace("-", "_")) {
+				return true;
+			}
+			// 检查文件路径是否包含语言目录 (例如 en/my-post.md)
+			if (post.id.startsWith(`${locale}/`) || post.id.startsWith(`${locale.toLowerCase()}/`)) {
+				return true;
+			}
+			return false;
+		});
+
+		for (const entry of langPosts) {
+			// 从 id 中提取 slug（移除语言前缀）
+			let slug = entry.slug;
+			if (slug.startsWith(`${locale}/`)) {
+				slug = slug.substring(locale.length + 1);
+			} else if (slug.startsWith(`${locale.toLowerCase()}/`)) {
+				slug = slug.substring(locale.toLowerCase().length + 1);
+			}
+
+			paths.push({
+				params: {
+					lang: locale,
+					slug: slug
+				},
+				props: {
+					entry,
+					locale
+				},
+			});
+		}
+	}
+
+	return paths;
+}
+
+const { entry, locale } = Astro.props;
+const { lang } = Astro.params;
+const { Content, headings } = await entry.render();
+
+const { remarkPluginFrontmatter } = await entry.render();
+
+const jsonLd = {
+	"@context": "https://schema.org",
+	"@type": "BlogPosting",
+	headline: entry.data.title,
+	description: entry.data.description || entry.data.title,
+	keywords: entry.data.tags,
+	author: {
+		"@type": "Person",
+		name: profileConfig.name,
+		url: Astro.site,
+	},
+	datePublished: formatDateToYYYYMMDD(entry.data.published),
+	...(entry.data.updated && { dateModified: formatDateToYYYYMMDD(entry.data.updated) }),
+	...(entry.data.image && { image: new URL(entry.data.image, Astro.site).href }),
+	inLanguage: locale || lang,
+};
+---
+<MainGridLayout title={entry.data.title} description={entry.data.description} image={entry.data.image} lang={locale || lang} setOGTypeArticle={true} headings={headings}>
+    <script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
+    <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative mb-4">
+        <div id="post-container" class:list={["card-base z-10 px-6 md:px-9 pt-6 pb-4 relative w-full ",
+            {}
+        ]}>
+            <!-- word count and reading time -->
+            <div class="flex flex-row text-black/30 dark:text-white/30 gap-5 mb-3 transition onload-animation">
+                <div class="flex flex-row items-center">
+                    <div class="transition h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 text-black/50 dark:text-white/50 flex items-center justify-center mr-2">
+                        <Icon name="material-symbols:notes-rounded"></Icon>
+                    </div>
+                    <div class="text-sm">{remarkPluginFrontmatter.words} {t("post.words", locale)}</div>
+                </div>
+                <div class="flex flex-row items-center">
+                    <div class="transition h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 text-black/50 dark:text-white/50 flex items-center justify-center mr-2">
+                        <Icon name="material-symbols:schedule-outline-rounded"></Icon>
+                    </div>
+                    <div class="text-sm">{remarkPluginFrontmatter.minutes} {t("post.minutes", locale)}</div>
+                </div>
+            </div>
+
+            <!-- title -->
+            <div class="relative onload-animation">
+                <div
+                    data-pagefind-body data-pagefind-weight="10" data-pagefind-meta="title"
+                    class="transition w-full flex items-center font-bold mb-3
+                    text-3xl md:text-[2.25rem]/[2.75rem]
+                    text-black/90 dark:text-white/90
+                    md:before:w-1 before:h-5 before:rounded-md before:bg-[var(--primary)]
+                    before:absolute before:top-[0.75rem] before:left-[-1.125rem]
+                ">
+                    {entry.data.pinned && (
+                        <span class="inline-flex items-center mr-3 px-2.5 py-1 text-sm font-medium bg-[oklch(95%_0.2_var(--hue))] dark:bg-[oklch(25%_0.2_var(--hue))] text-[oklch(55%_0.2_var(--hue))] dark:text-[oklch(85%_0.2_var(--hue))] rounded">
+                            <Icon name="material-symbols:push-pin" class="mr-1.5 text-base" /> {t("common.pinnedPost", locale)}
+                        </span>
+                    )}
+                    <span>{entry.data.title}</span>
+                </div>
+            </div>
+
+            <!-- description/excerpt -->
+            {(entry.data.description || remarkPluginFrontmatter.excerpt) && (
+                <div class="onload-animation mb-4">
+                    <div class="text-black/75 dark:text-white/75 text-sm leading-relaxed">
+                        {entry.data.description || remarkPluginFrontmatter.excerpt}
+                    </div>
+                </div>
+            )}
+
+            <!-- metadata -->
+            <div class="onload-animation">
+                <PostMetadata
+                        class="mb-5"
+                        published={entry.data.published}
+                        updated={entry.data.updated}
+                        tags={entry.data.tags}
+                        slug={entry.slug}
+                ></PostMetadata>
+                {!entry.data.image && <div class="border-[var(--line-divider)] border-dashed border-b-[1px] mb-5"></div>}
+            </div>
+
+            <Markdown class="mb-6 markdown-content onload-animation">
+                <Content />
+            </Markdown>
+
+            {licenseConfig.enable && <License title={entry.data.title} slug={entry.slug} pubDate={entry.data.published} class="mb-6 rounded-xl onload-animation"></License>}
+
+        </div>
+    </div>
+
+    <div class="flex flex-col md:flex-row justify-between mb-4 gap-4 overflow-hidden w-full">
+    </div>
+
+</MainGridLayout>

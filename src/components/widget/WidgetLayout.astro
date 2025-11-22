@@ -1,5 +1,6 @@
 ---
 import { Icon } from "astro-icon/components";
+import { t, getCurrentLocale } from "../../i18n";
 
 interface Props {
 	id: string;
@@ -11,6 +12,7 @@ interface Props {
 }
 const { id, name, isCollapsed, collapsedHeight, style } = Astro.props;
 const className = Astro.props.class;
+const locale = getCurrentLocale();
 ---
 <widget-layout data-id={id} data-is-collapsed={String(isCollapsed)} class={"pb-4 card-base " + className} style={style}>
     <div class="font-bold transition text-lg text-neutral-900 dark:text-neutral-100 relative ml-8 mt-4 mb-2
@@ -22,7 +24,7 @@ const className = Astro.props.class;
     {isCollapsed && <div class="expand-btn px-4 -mb-2">
         <button class="btn-plain rounded-lg w-full h-9">
             <div class="text-[var(--primary)] flex items-center justify-center gap-2 -translate-x-2">
-                <Icon name="material-symbols:more-horiz" class="text-[1.75rem]"></Icon> <span data-i18n-widget="more">更多</span>
+                <Icon name="material-symbols:more-horiz" class="text-[1.75rem]"></Icon> <span data-i18n-widget="more">{t("common.more", locale)}</span>
             </div>
         </button>
     </div>}

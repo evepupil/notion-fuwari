@@ -98,12 +98,12 @@ export function updatePageTranslations() {
 	// 更新 Pagination 文本
 	const paginationPrev = document.querySelector('[data-i18n-pagination="prev"]');
 	if (paginationPrev) {
-		paginationPrev.textContent = t('common.previous', currentLocale);
+		paginationPrev.textContent = t('common.prevPage', currentLocale);
 	}
 
 	const paginationNext = document.querySelector('[data-i18n-pagination="next"]');
 	if (paginationNext) {
-		paginationNext.textContent = t('common.next', currentLocale);
+		paginationNext.textContent = t('common.nextPage', currentLocale);
 	}
 
 	// 更新 BackToTop 文本
@@ -127,6 +127,22 @@ export function updatePageTranslations() {
 	if (archiveTags) {
 		archiveTags.textContent = t('archive.tags', currentLocale);
 	}
+
+	// 更新 Widget 文本
+	const widgetMore = document.querySelectorAll('[data-i18n-widget="more"]');
+	widgetMore.forEach((element) => {
+		element.textContent = t('common.more', currentLocale);
+	});
+
+	const widgetTags = document.querySelectorAll('[data-i18n-widget="tags"]');
+	widgetTags.forEach((element) => {
+		element.textContent = t('common.tags', currentLocale);
+	});
+
+	const widgetToc = document.querySelectorAll('[data-i18n-widget="toc"]');
+	widgetToc.forEach((element) => {
+		element.textContent = t('common.toc', currentLocale);
+	});
 
 	// 更新页面标题
 	const pageTitleElement = document.querySelector('[data-i18n-page="title"]');

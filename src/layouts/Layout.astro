@@ -850,12 +850,13 @@ if (window.swup) {
 				},
 				common: {
 					'noTags': '无标签',
-					'previous': '上一页',
-					'next': '下一页',
+					'prevPage': '上一页',
+					'nextPage': '下一页',
 					'backToTop': '返回顶部',
 					'page': '第',
 					'tags': '标签',
-					'search': '搜索'
+					'search': '搜索',
+					'more': '更多'
 				},
 				post: {
 					'publishedAt': '发布于',
@@ -864,6 +865,12 @@ if (window.swup) {
 					'license': '许可协议',
 					'minutes': '分钟',
 					'words': '字'
+				},
+				stats: {
+					'views': '浏览',
+					'visitors': '访客',
+					'loading': '统计加载中...',
+					'error': '统计不可用。请检查是否屏蔽了Umami域名，如AdGuard和AdBlock等插件'
 				},
 				footer: {
 					'licensed': '采用',
@@ -906,12 +913,13 @@ if (window.swup) {
 				},
 				common: {
 					'noTags': 'No Tags',
-					'previous': 'Previous',
-					'next': 'Next',
+					'prevPage': 'Previous',
+					'nextPage': 'Next',
 					'backToTop': 'Back to Top',
 					'page': 'Page',
 					'tags': 'Tags',
-					'search': 'Search'
+					'search': 'Search',
+					'more': 'More'
 				},
 				post: {
 					'publishedAt': 'Published',
@@ -920,6 +928,12 @@ if (window.swup) {
 					'license': 'License',
 					'minutes': 'min',
 					'words': 'words'
+				},
+				stats: {
+					'views': 'Views',
+					'visitors': 'Visitors',
+					'loading': 'Loading stats...',
+					'error': 'Stats unavailable. Please check if Umami domain is blocked by AdGuard or AdBlock extensions'
 				},
 				footer: {
 					'licensed': 'Licensed under',
@@ -1055,10 +1069,10 @@ if (window.swup) {
 
 			// 更新分页文本
 			const paginationPrev = document.querySelector('[data-i18n-pagination="prev"]');
-			if (paginationPrev) paginationPrev.textContent = t('common.previous', currentLocale);
+			if (paginationPrev) paginationPrev.textContent = t('common.prevPage', currentLocale);
 
 			const paginationNext = document.querySelector('[data-i18n-pagination="next"]');
-			if (paginationNext) paginationNext.textContent = t('common.next', currentLocale);
+			if (paginationNext) paginationNext.textContent = t('common.nextPage', currentLocale);
 
 			// 更新回到顶部文本
 			const backToTop = document.querySelector('[data-i18n="backToTop"]');
@@ -1109,7 +1123,7 @@ if (window.swup) {
 			// 更新 WidgetLayout 中的"更多"按钮文本
 			const moreElements = document.querySelectorAll('[data-i18n-widget="more"]');
 			moreElements.forEach((element) => {
-				element.textContent = currentLocale === 'en' ? 'More' : '更多';
+				element.textContent = t('common.more', currentLocale);
 			});
 
 			// 更新 License 组件文本
@@ -1122,36 +1136,35 @@ if (window.swup) {
 			const licenseLicense = document.querySelector('[data-i18n-license="license"]');
 			if (licenseLicense) licenseLicense.textContent = t('post.license', currentLocale);
 
-			// 更新统计文本（"浏览" 和 "访客"）
-			// 这些文本在脚本变量中，需要替换所有包含这些词的地方
-			if (currentLocale === 'en') {
-				// 替换页面中的统计显示
-				document.querySelectorAll('[id^="page-views-"]').forEach((element) => {
-					if (element.textContent && element.textContent.includes('浏览')) {
-						element.textContent = element.textContent.replace(/浏览/g, 'Views').replace(/访客/g, 'Visitors');
-					}
-				});
+			// 更新文章卡片和文章页面的"字"和"分钟"文本
+			const postWordsElements = document.querySelectorAll('[data-i18n-post="words"]');
+			postWordsElements.forEach((element) => {
+				element.textContent = t('post.words', currentLocale);
+			});
 
-				// 替换侧边栏Profile组件的统计显示
-				const siteStatsElement = document.getElementById('site-stats');
-				if (siteStatsElement && siteStatsElement.textContent) {
-					if (siteStatsElement.textContent.includes('浏览') || siteStatsElement.textContent.includes('访客')) {
-						siteStatsElement.textContent = siteStatsElement.textContent
-							.replace(/浏览/g, 'Views')
-							.replace(/访客/g, 'Visitors');
-					}
+			const postMinutesElements = document.querySelectorAll('[data-i18n-post="minutes"]');
+			postMinutesElements.forEach((element) => {
+				element.textContent = t('post.minutes', currentLocale);
+			});
+
+			// 更新标签组件的标题
+			document.querySelectorAll('[data-i18n-widget="tags"]').forEach((element) => {
+				// 找到父元素中的标题div
+				const titleDiv = element.querySelector('.font-bold');
+				if (titleDiv) {
+					titleDiv.textContent = t('common.tags', currentLocale);
 				}
+			});
 
-				// 替换文章详情页面的"字"和"分钟"
-				document.querySelectorAll('.custom-md .text-sm').forEach((element) => {
-					if (element.textContent && element.textContent.includes('字')) {
-						element.textContent = element.textContent.replace(/字/g, 'words');
-					}
-					if (element.textContent && element.textContent.includes('分钟')) {
-						element.textContent = element.textContent.replace(/分钟/g, 'min');
-					}
-				});
-			}
+			// 更新统计加载文本
+			const statsLoadingElements = document.querySelectorAll('[data-i18n-stats="loading"]');
+			statsLoadingElements.forEach((element) => {
+				// 只更新还在显示"加载中"状态的元素
+				const text = element.textContent || '';
+				if (text.includes('加载中') || text.includes('Loading')) {
+					element.textContent = t('stats.loading', currentLocale);
+				}
+			});
 		}
 
 		// 页面加载完成后执行

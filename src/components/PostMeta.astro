@@ -73,38 +73,42 @@ const locale = getCurrentLocale();
             <div class="meta-icon">
                 <Icon name="material-symbols:visibility-outline-rounded" class="text-xl"></Icon>
             </div>
-            <span class="text-50 text-sm font-medium" id="page-views-display">{statsConfig.loadingText}</span>
+            <span class="text-50 text-sm font-medium" id="page-views-display" data-i18n-stats="loading">{t("stats.loading", locale)}</span>
         </div>
     )}
 </div>
 
 {slug && (
-    <script define:vars={{ slug, umamiConfig, unavailableText: statsConfig.unavailableText, viewsText: statsConfig.viewsText, visitsText: statsConfig.visitsText }}>
-        // 客户端统计文案生成函数
+    <script define:vars={{ slug, umamiConfig }}>
+        // 客户端统计文案生成函数 - 使用动态翻译
         function generateStatsText(pageViews, visits) {
+            // 从页面中获取当前语言设置
+            const currentLocale = localStorage.getItem('preferred-locale') || 'zh-CN';
+            const viewsText = currentLocale === 'en' ? 'Views' : '浏览';
+            const visitsText = currentLocale === 'en' ? 'Visitors' : '访客';
             return `${viewsText} ${pageViews} · ${visitsText} ${visits}`;
         }
-        
+
         // 获取访问量统计
         async function fetchPageViews(isRetry = false) {
             if (!umamiConfig.enable) {
                 return;
             }
-            
+
             try {
                 // 调用全局工具获取 Umami 分享数据
                 const { websiteId, token } = await getUmamiShareData(umamiConfig.baseUrl, umamiConfig.shareId);
-                
+
                 // 第二步：获取统计数据
                 const currentTimestamp = Date.now();
                 const statsUrl = `${umamiConfig.baseUrl}/analytics/us/api/websites/${websiteId}/stats?startAt=0&endAt=${currentTimestamp}&unit=hour&timezone=${encodeURIComponent(umamiConfig.timezone)}&path=eq.%2Fposts%2F${slug}%2F&compare=false`;
-                
+
                 const statsResponse = await fetch(statsUrl, {
                     headers: {
                         'x-umami-share-token': token
                     }
                 });
-                
+
                 if (!statsResponse.ok) {
                     if (statsResponse.status === 401 && !isRetry) {
                         clearUmamiShareCache();
@@ -112,17 +116,21 @@ const locale = getCurrentLocale();
                     }
                     throw new Error('获取统计数据失败');
                 }
-                
+
                 const statsData = await statsResponse.json();
             const pageViews = statsData.pageviews || 0;
             const visits = statsData.visitors || 0;
-                
+
                 const displayElement = document.getElementById('page-views-display');
                 if (displayElement) {
                     displayElement.textContent = generateStatsText(pageViews, visits);
                 }
             } catch (error) {
                 console.error('Error fetching page views:', error);
+                const currentLocale = localStorage.getItem('preferred-locale') || 'zh-CN';
+                const unavailableText = currentLocale === 'en'
+                    ? 'Stats unavailable. Please check if Umami domain is blocked by AdGuard or AdBlock extensions'
+                    : '统计不可用。请检查是否屏蔽了Umami域名，如AdGuard和AdBlock等插件';
                 const displayElement = document.getElementById('page-views-display');
                 if (displayElement) {
                     displayElement.textContent = unavailableText;

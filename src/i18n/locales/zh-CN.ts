@@ -22,6 +22,7 @@ export const zhCN = {
 		pinnedPost: "置顶",
 		noTags: "无标签",
 		page: "第",
+		more: "更多",
 	},
 
 	// 文章
@@ -64,7 +65,7 @@ export const zhCN = {
 		views: "浏览",
 		visitors: "访客",
 		loading: "统计加载中...",
-		error: "统计加载失败",
+		error: "统计不可用。请检查是否屏蔽了Umami域名，如AdGuard和AdBlock等插件",
 	},
 
 	// 友链

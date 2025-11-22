@@ -60,13 +60,13 @@ const jsonLd = {
                     <div class="transition h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 text-black/50 dark:text-white/50 flex items-center justify-center mr-2">
                         <Icon name="material-symbols:notes-rounded"></Icon>
                     </div>
-                    <div class="text-sm">{remarkPluginFrontmatter.words} {t('post.words', locale)}</div>
+                    <div class="text-sm"><span data-i18n-words={entry.slug}>{remarkPluginFrontmatter.words}</span> <span data-i18n-post="words">{t('post.words', locale)}</span></div>
                 </div>
                 <div class="flex flex-row items-center">
                     <div class="transition h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 text-black/50 dark:text-white/50 flex items-center justify-center mr-2">
                         <Icon name="material-symbols:schedule-outline-rounded"></Icon>
                     </div>
-                    <div class="text-sm">{remarkPluginFrontmatter.minutes} {t('post.minutes', locale)}</div>
+                    <div class="text-sm"><span data-i18n-minutes={entry.slug}>{remarkPluginFrontmatter.minutes}</span> <span data-i18n-post="minutes">{t('post.minutes', locale)}</span></div>
                 </div>
             </div>
 

@@ -24,6 +24,7 @@ export const en: TranslationKeys = {
 		pinnedPost: "Pinned",
 		noTags: "No tags",
 		page: "Page",
+		more: "More",
 	},
 
 	// Post
@@ -66,7 +67,7 @@ export const en: TranslationKeys = {
 		views: "Views",
 		visitors: "Visitors",
 		loading: "Loading stats...",
-		error: "Failed to load stats",
+		error: "Stats unavailable. Please check if Umami domain is blocked by AdGuard or AdBlock extensions",
 	},
 
 	// Friends

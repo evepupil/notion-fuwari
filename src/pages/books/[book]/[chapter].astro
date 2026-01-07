@@ -34,10 +34,66 @@ if (!book) {
 }
 
 const { Content, headings } = await chapter.render();
+const allChapters = await getBookChapters(bookSlug);
 ---
 <MainGridLayout title={`${chapter.title} - ${book.title}`} description={book.description} headings={headings} hideSidebar={true}>
-	<div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative mb-4">
-		<div class="card-base z-10 px-6 md:px-9 py-6 relative w-full">
+	<div class="flex gap-4 w-full items-start">
+		<!-- 左侧目录侧边栏 - 常驻显示 -->
+		<aside class="hidden lg:block flex-shrink-0 w-64 xl:w-72">
+			<div class="card-base rounded-[var(--radius-large)] overflow-hidden flex flex-col sticky top-24" id="book-toc-card">
+					<!-- 图书信息头部 -->
+					<div class="p-4 border-b border-[var(--line-divider)] flex-shrink-0">
+						<a href={`/books/${bookSlug}/`} class="block group">
+							<div class="flex items-center gap-2 mb-2">
+								<Icon name="material-symbols:menu-book" class="text-xl text-[var(--primary)]" />
+								<h2 class="font-bold text-black/90 dark:text-white/90">目录</h2>
+							</div>
+							<h3 class="text-sm text-black/70 dark:text-white/70 group-hover:text-[var(--primary)] transition-colors line-clamp-2 mb-1">
+								{book.title}
+							</h3>
+							<div class="text-xs text-black/50 dark:text-white/50">
+								共 {allChapters.length} 章
+							</div>
+						</a>
+					</div>
+
+					<!-- 章节列表 -->
+					<div class="flex-1 overflow-y-auto">
+						<nav class="p-2">
+							{allChapters.map((ch) => {
+								const isActive = ch.chapterSlug === chapter.chapterSlug;
+								return (
+									<a
+										href={`/books/${bookSlug}/${ch.chapterSlug}/`}
+										class={`block px-3 py-2.5 rounded-lg mb-1 transition-all ${
+											isActive
+												? 'bg-[var(--primary)]/10 text-[var(--primary)] font-medium shadow-sm'
+												: 'text-black/70 dark:text-white/70 hover:bg-black/5 dark:hover:bg-white/5 hover:text-[var(--primary)]'
+										}`}
+									>
+										<div class="flex items-start gap-2">
+											<span class="flex-shrink-0 text-xs mt-0.5 opacity-60">
+												{ch.order}.
+											</span>
+											<span class="flex-1 text-sm leading-relaxed">
+												{ch.title}
+											</span>
+											{isActive && (
+												<Icon name="material-symbols:play-arrow-rounded" class="flex-shrink-0 text-base" />
+											)}
+										</div>
+									</a>
+								);
+							})}
+						</nav>
+					</div>
+				</div>
+		</aside>
+
+		<!-- 右侧主内容区 -->
+		<div class="flex-1 min-w-0">
+			<div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative mb-4" id="chapter-content-card">
+				<div class="card-base z-10 px-6 md:px-9 py-6 relative w-full">
 			<!-- 面包屑导航 -->
 			<nav class="flex items-center gap-2 text-sm text-black/50 dark:text-white/50 mb-4 flex-wrap">
 				<a href="/books/" class="hover:text-[var(--primary)] transition-colors">图书</a>
@@ -51,6 +107,8 @@ const { Content, headings } = await chapter.render();
 			<div class="mb-6">
 				<div class="flex items-center gap-2 text-sm text-black/50 dark:text-white/50 mb-2">
 					<span>第 {chapter.order} 章</span>
+					<!-- 移动端显示总章节数 -->
+					<span class="lg:hidden">/ 共 {allChapters.length} 章</span>
 				</div>
 				<h1 class="text-2xl md:text-3xl font-bold text-black/90 dark:text-white/90">
 					{chapter.title}
@@ -118,4 +176,76 @@ const { Content, headings } = await chapter.render();
 			</div>
 		</div>
 	</div>
+		</div>
+	</div>
 </MainGridLayout>
+
+<script>
+	// 页面加载时滚动到当前章节
+	const currentChapter = document.querySelector('.bg-\\[var\\(--primary\\)\\]\\/10');
+	if (currentChapter) {
+		// 延迟执行，确保DOM完全加载
+		setTimeout(() => {
+			currentChapter.scrollIntoView({ block: 'center', behavior: 'smooth' });
+		}, 100);
+	}
+
+	// 动态调整左侧目录高度以匹配右侧内容
+	function syncTocHeight() {
+		const tocCard = document.getElementById('book-toc-card');
+		const contentCard = document.getElementById('chapter-content-card');
+
+		if (tocCard && contentCard) {
+			const contentHeight = contentCard.offsetHeight;
+			tocCard.style.height = `${contentHeight}px`;
+		}
+	}
+
+	// 页面加载完成后调整
+	window.addEventListener('load', syncTocHeight);
+
+	// 窗口大小变化时重新调整
+	let resizeTimer: number;
+	window.addEventListener('resize', () => {
+		clearTimeout(resizeTimer);
+		resizeTimer = window.setTimeout(syncTocHeight, 100);
+	});
+
+	// 使用 ResizeObserver 监听内容变化
+	const contentCard = document.getElementById('chapter-content-card');
+	if (contentCard) {
+		const resizeObserver = new ResizeObserver(() => {
+			syncTocHeight();
+		});
+		resizeObserver.observe(contentCard);
+	}
+</script>
+
+<style>
+	/* 自定义滚动条样式 */
+	aside nav {
+		scrollbar-width: thin;
+		scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+	}
+
+	aside nav::-webkit-scrollbar {
+		width: 6px;
+	}
+
+	aside nav::-webkit-scrollbar-track {
+		background: transparent;
+	}
+
+	aside nav::-webkit-scrollbar-thumb {
+		background-color: rgba(0, 0, 0, 0.2);
+		border-radius: 3px;
+	}
+
+	:global(.dark) aside nav {
+		scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+	}
+
+	:global(.dark) aside nav::-webkit-scrollbar-thumb {
+		background-color: rgba(255, 255, 255, 0.2);
+	}
+</style>

@@ -79,29 +79,46 @@ export const onRequestPost = async (context: {
 
     // 转换为 SSE 格式流式传输
     const encoder = new TextEncoder();
+
+    // 如果 result 是 Response 对象，直接返回其 body
+    if (result instanceof Response) {
+      return new Response(result.body, {
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'Connection': 'keep-alive',
+          'Access-Control-Allow-Origin': '*',
+        },
+      });
+    }
+
+    // 否则处理为流式数据
     const readable = new ReadableStream({
       async start(controller) {
         try {
-          // 处理流式响应
-          const reader = result.getReader();
-
-          while (true) {
-            const { done, value } = await reader.read();
-
-            if (done) {
-              break;
+          // 尝试不同的流式处理方式
+          if (typeof result[Symbol.asyncIterator] === 'function') {
+            // 处理异步迭代器
+            for await (const chunk of result) {
+              const wrapped = `data: ${JSON.stringify({ result: chunk })}\n\n`;
+              controller.enqueue(encoder.encode(wrapped));
             }
-
-            // value 应该是官方返回的数据块
-            // 官方格式: { response: "...", data: [...] }
-            // 需要转换为前端期望的格式: { result: { response: "...", data: [...] } }
-            const wrapped = `data: ${JSON.stringify({ result: value })}\n\n`;
+          } else if (result && typeof result.getReader === 'function') {
+            // 处理 ReadableStream
+            const reader = result.getReader();
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              const wrapped = `data: ${JSON.stringify({ result: value })}\n\n`;
+              controller.enqueue(encoder.encode(wrapped));
+            }
+          } else {
+            // 非流式响应，直接返回
+            const wrapped = `data: ${JSON.stringify({ result })}\n\n`;
             controller.enqueue(encoder.encode(wrapped));
           }
-
         } catch (error) {
           console.error('Stream error:', error);
-          // 发送错误信息
           const errorMsg = `data: ${JSON.stringify({
             error: error instanceof Error ? error.message : 'Stream error'
           })}\n\n`;

@@ -16,7 +16,7 @@ for (const heading of headings) {
 
 const className = Astro.props.class;
 
-const isPostsRoute = Astro.url.pathname.startsWith("/posts/");
+const isPostsRoute = Astro.url.pathname.startsWith("/posts/") || Astro.url.pathname.startsWith("/books/");
 
 const removeTailingHash = (text: string) => {
 	let lastIndexOfHash = text.lastIndexOf("#");
@@ -58,6 +58,7 @@ const maxLevel = siteConfig.toc.depth;
     <div id="active-indicator" class:list={[{'hidden': headings.length == 0}, "-z-10 absolute bg-[var(--toc-btn-hover)] left-0 right-0 rounded-xl transition-all " +
         "group-hover:bg-transparent border-2 border-[var(--toc-btn-hover)] group-hover:border-[var(--toc-btn-active)] border-dashed"]}></div>
 </table-of-contents>}
+
 
 <script>
 class TableOfContents extends HTMLElement {

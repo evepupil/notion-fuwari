@@ -1,7 +1,7 @@
 interface Env {
   AI: {
     autorag: (name: string) => {
-      aiSearch: (options: any) => Promise<ReadableStream>;
+      aiSearch: (options: any) => Promise<Response>;
     };
   };
 }
@@ -65,71 +65,66 @@ export const onRequestPost = async (context: {
     const result = await env.AI.autorag("purple-rain-8860").aiSearch({
       query: query.trim(),
       model: "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-      rewrite_query: true,        // 优化查询
-      max_num_results: 5,         // 最多返回5个相关结果
+      rewrite_query: true,
+      max_num_results: 5,
       ranking_options: {
-        score_threshold: 0.3      // 相关性阈值
+        score_threshold: 0.3
       },
       reranking: {
-        enabled: true,            // 启用重排序
+        enabled: true,
         model: "@cf/baai/bge-reranker-base"
       },
-      stream: true,               // 启用流式响应
+      stream: true,
     });
 
-    // 转换为 SSE 格式流式传输
+    // AutoRAG 返回的是 Response 对象，包含 SSE 流
+    // 格式: data: {"response":"累积文本","p":"..."}
+    // 需要转换为前端期望的格式: data: {"result":{"response":"...","data":[...]}}
+
     const encoder = new TextEncoder();
+    const decoder = new TextDecoder();
 
-    // 如果 result 是 Response 对象，直接返回其 body
-    if (result instanceof Response) {
-      return new Response(result.body, {
-        headers: {
-          'Content-Type': 'text/event-stream',
-          'Cache-Control': 'no-cache',
-          'Connection': 'keep-alive',
-          'Access-Control-Allow-Origin': '*',
-        },
-      });
-    }
+    // 创建转换流
+    const transformStream = new TransformStream({
+      transform(chunk, controller) {
+        const text = decoder.decode(chunk, { stream: true });
+        const lines = text.split('\n');
 
-    // 否则处理为流式数据
-    const readable = new ReadableStream({
-      async start(controller) {
-        try {
-          // 尝试不同的流式处理方式
-          if (typeof result[Symbol.asyncIterator] === 'function') {
-            // 处理异步迭代器
-            for await (const chunk of result) {
-              const wrapped = `data: ${JSON.stringify({ result: chunk })}\n\n`;
-              controller.enqueue(encoder.encode(wrapped));
-            }
-          } else if (result && typeof result.getReader === 'function') {
-            // 处理 ReadableStream
-            const reader = result.getReader();
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-              const wrapped = `data: ${JSON.stringify({ result: value })}\n\n`;
-              controller.enqueue(encoder.encode(wrapped));
-            }
-          } else {
-            // 非流式响应，直接返回
-            const wrapped = `data: ${JSON.stringify({ result })}\n\n`;
-            controller.enqueue(encoder.encode(wrapped));
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+
+          try {
+            const jsonStr = line.slice(6).trim();
+            if (!jsonStr) continue;
+
+            const data = JSON.parse(jsonStr);
+
+            // 包装成前端期望的格式
+            const wrapped = {
+              result: {
+                response: data.response || '',
+                data: data.data || []
+              }
+            };
+
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify(wrapped)}\n\n`));
+          } catch (e) {
+            // 忽略解析错误，继续处理下一行
           }
-        } catch (error) {
-          console.error('Stream error:', error);
-          const errorMsg = `data: ${JSON.stringify({
-            error: error instanceof Error ? error.message : 'Stream error'
-          })}\n\n`;
-          controller.enqueue(encoder.encode(errorMsg));
-        } finally {
-          controller.close();
         }
       }
     });
 
-    return new Response(readable, {
+    // 获取原始流并转换
+    const originalBody = result instanceof Response ? result.body : result;
+
+    if (!originalBody) {
+      throw new Error('No response body');
+    }
+
+    const transformedStream = originalBody.pipeThrough(transformStream);
+
+    return new Response(transformedStream, {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',

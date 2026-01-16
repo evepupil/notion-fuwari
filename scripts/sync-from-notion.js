@@ -246,7 +246,7 @@ async function fetchPublishedPosts() {
  */
 async function processPost(page) {
   const properties = page.properties;
-
+  console.log(JSON.stringify(properties))
   // 获取文章属性
   const title = properties.Title?.title[0]?.plain_text || 'Untitled';
   const slug = generateSlug(title);

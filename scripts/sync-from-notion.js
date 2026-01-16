@@ -251,7 +251,7 @@ async function processPost(page) {
   const title = properties.Title?.title[0]?.plain_text || 'Untitled';
   const slug = generateSlug(title);
   const firstCoverImage = properties['Featured Image']?.files[0]
-  const coverImage = firstCoverImage?.file.url || firstCoverImage.external.url
+  const coverImage = firstCoverImage?.file?.url || firstCoverImage?.external?.url
   const publishedDate = properties['Published Date']?.date?.start || new Date().toISOString();
   const tags = properties.Tags?.multi_select?.map(tag => tag.name) || [];
   const category = properties.Category?.select?.name;

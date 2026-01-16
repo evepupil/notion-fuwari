@@ -361,7 +361,7 @@ const bannerOffset =
 					const currentDomain = window.location.hostname;
 					
 					// 获取所有官方域名
-					const officialDomains = officialSites.map(site => {
+					const officialDomains = true && officialSites.map(site => {
 						try {
 							return new URL(site).hostname;
 						} catch (e) {

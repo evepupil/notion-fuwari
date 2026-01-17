@@ -12,7 +12,7 @@ import type {
 import { LinkPreset } from "./types/config";
 
 export const siteConfig: SiteConfig = {
-	title: "潮思Chaosyn",
+	title: "花渐畔",
 	subtitle: "技术探索与思维进化",
 	description:
 		"分享Serverless架构、AI应用开发、认知科学、科学学习方法与前后端技术实践的个人博客，专注于云原生、无服务器计算和智能应用开发，探索技术如何赋能学习与创新",
@@ -69,7 +69,7 @@ export const siteConfig: SiteConfig = {
 	favicon: [
 		// Leave this array empty to use the default favicon
 		{
-			src: "/favicon/69108294_p7.jpg", // Path of the favicon, relative to the /public directory
+			src: "https://blogoss.678910.best/rin/rin-images/a52f77ee17dcb7c05ac9fd5c5c7d2fa88663475d.png", // Path of the favicon, relative to the /public directory
 			//   theme: 'light',              // (Optional) Either 'light' or 'dark', set only if you have different favicons for light and dark mode
 			//   sizes: '32x32',              // (Optional) Size of the favicon, set only if you have favicons of different sizes
 		},
@@ -88,7 +88,7 @@ export const navBarConfig: NavBarConfig = {
 		LinkPreset.About,
 		{
 			name: "统计",
-			url: "https://cloud.umami.is/share/VOIhBeLJ4qp3otfX", // Internal links should not include the base path, as it is automatically added
+			url: "https://cloud.umami.is/share/5H4KmYOEzPrCPML2", // Internal links should not include the base path, as it is automatically added
 			external: true, // Show an external link icon and will open in a new tab
 		},
 	],
@@ -97,23 +97,18 @@ export const navBarConfig: NavBarConfig = {
 export const profileConfig: ProfileConfig = {
 	avatars: [
 		// 多个头像，每次刷新随机显示一个
-		"/profile/avatar/69108294_p0.jpg",
-		"/profile/avatar/69108294_p13.jpg",
-		"/profile/avatar/69108294_p7.jpg",
-		"/profile/avatar/98308336_p5.png",
+		"https://blogoss.678910.best/rin/rin-images/a52f77ee17dcb7c05ac9fd5c5c7d2fa88663475d.png",
+		// "/profile/avatar/69108294_p13.jpg",
+		// "/profile/avatar/69108294_p7.jpg",
+		// "/profile/avatar/98308336_p5.png",
 	],
-	name: "叶桐",
-	bio: "無くした日々にさよなら",
+	name: "花渐畔",
+	bio: "Believe You Self.",
 	links: [
-		{
-			name: "知乎",
-			icon: "fa6-brands:zhihu",
-			url: "https://www.zhihu.com/people/ye-tong-95-79",
-		},
 		{
 			name: "GitHub",
 			icon: "fa6-brands:github",
-			url: "https://github.com/evepupil",
+			url: "https://github.com/huajianpan",
 		},
 	],
 };
@@ -133,7 +128,7 @@ export const imageFallbackConfig: ImageFallbackConfig = {
 export const umamiConfig: UmamiConfig = {
 	enable: true,
 	baseUrl: "https://cloud.umami.is",
-	shareId: "VOIhBeLJ4qp3otfX", // ⚠️ 请替换为你自己的 Share ID，不要用原作者的
+	shareId: "5H4KmYOEzPrCPML2", // ⚠️ 请替换为你自己的 Share ID，不要用原作者的
 	timezone: "Asia/Shanghai",
 };
 
@@ -143,7 +138,7 @@ export const expressiveCodeConfig: ExpressiveCodeConfig = {
 
 export const gitHubEditConfig: GitHubEditConfig = {
 	enable: true,
-	baseUrl: "https://github.com/evepupil/notion-fuwari/blob/master/src/content/posts",
+	baseUrl: "https://github.com/huajianpan/notion-fuwari/blob/master/src/content/posts",
 };
 
 
@@ -161,7 +156,7 @@ export const analyticsConfig: AnalyticsConfig = {
 	// Umami 云端分析（原作者的配置，建议删除或替换）
 	umamiCloud: {
 		enable: true,
-		websiteId: "526149f7-e7d5-40ac-ae75-50a0c2515abf",
+		websiteId: "84ff2cd6-164b-4d14-8f8c-4133ee719fee",
 	},
 	// 百度统计（原作者的配置，建议删除或替换）
 	baidu: {
@@ -180,7 +175,7 @@ export const analyticsConfig: AnalyticsConfig = {
 	},
 	// Google Analytics（原作者的配置，建议删除或替换）
 	googleAnalytics: {
-		enable: true,
+		enable: false,
 		measurementId: "G-D9ZRKT7G85",
 	},
 	// Cloudflare Web Analytics（原作者的配置，建议删除或替换）

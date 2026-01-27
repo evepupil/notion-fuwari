@@ -3,7 +3,7 @@ title: 'Cloud Flare配置优选节点教程'
 published: 2025-11-23
 description: 'Cloud Flare优选节点是在你请求CF的时候自动获取最佳节点，相较于未配置的情况（随机分配节点），访问速度明显加快，如图：'
 image: ''
-tags: ["cloud flare"]
+tags: ["Cloudflare"]
 draft: false
 lang: ''
 category: '技术'

@@ -3,7 +3,7 @@ title: 'Cloudflare Worker反向代理网站教程'
 published: 2025-11-17
 description: '反向代理就是**代替你访问目标网站**，然后把结果返回给你。比如你想访问 `example.com`，但你不想直接访问，而是通过 Cloudflare Worker 去访问，然后 Workers 再把内容返回给你。'
 image: '../assets/images/cloudflare-worker反向代理网站教程/cover.jpg'
-tags: ["cloud flare", "好玩", "serverless"]
+tags: ["Cloudflare", "好玩", "serverless"]
 draft: false
 lang: ''
 category: '技术'

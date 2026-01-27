@@ -1,13 +1,13 @@
 ---
 title: '《日语语法指南》'
 author: 'Tae Kim'
-translator: 'AI 译者'
+translator: 'Gemini'
 published: 2012-11-21
 updated: 2026-01-13
 description: '一本从日语的思维角度出发，系统构建日语语法基础的经典指南。'
 image: ''
 tags: ['日语', '语法', '教材', 'Tae Kim']
-status: 'ongoing'
+status: 'completed'
 draft: false
 ---
 

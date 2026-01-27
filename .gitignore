@@ -31,3 +31,4 @@ yarn.lock
 
 # 忽略上游仓库
 ori
+*-cwd

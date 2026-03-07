@@ -195,6 +195,12 @@ npx wrangler pages deploy dist
 ```
 
 
+### 6.3 效果
+
+
+![image.png](../assets/images/cloudflare-ai-search-autorag-接入实战-个人博客的知识库ai助手/image-4.png)
+
+
 ## 总结
 
 

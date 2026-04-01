@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+# 允许抓取静态资源，确保蜘蛛能正确渲染页面
+Allow: /_astro/ 
+Disallow: /_astro/*.json # 如果你想保护配置数据，可以只禁 json
+
+# 针对 AI 机器人的限制单独列出（保留 Cloudflare 的初衷）
+User-agent: GPTBot
+Disallow: /
+User-agent: CCBot
+Disallow: /
+User-agent: ClaudeBot
+Disallow: /
+User-agent: Bytespider
+Disallow: /
+
+Sitemap: https://blog.chaosyn.com/sitemap-index.xml

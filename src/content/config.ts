@@ -19,6 +19,8 @@ const postsCollection = defineCollection({
 			.default("zh-CN"),
 		translationKey: z.string().optional().default(""),
 		pinned: z.boolean().optional().default(false),
+		notionSync: z.boolean().optional().default(false),
+		notionPageId: z.string().optional().default(""),
 
 		/* For internal use */
 		prevTitle: z.string().default(""),

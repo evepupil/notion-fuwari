@@ -92,11 +92,14 @@ pnpm preview
 3. **同步到博客**
 
    ```bash
-   # 强制覆盖所有文章（默认）
+   # 默认同步：只覆盖带 Notion 标记的文章
    pnpm sync-notion
 
    # 仅添加新文章，不覆盖已存在的
    pnpm sync-notion:new
+
+   # 增量同步：新增文章，并更新带 Notion 标记的文章
+   pnpm sync-notion:append
    ```
 
    脚本会自动：
@@ -262,7 +265,7 @@ pnpm build
 astro build
 ```
 
-**注意**：`pnpm build` 会自动执行 `pnpm sync-notion` 同步最新文章，然后构建。
+**注意**：`pnpm build` 会自动执行 `pnpm sync-notion` 同步最新文章，然后构建。默认只会覆盖带 `notionSync: true` 标记的文章，不会改动手写文章。
 
 ### 推荐工作流
 

@@ -17,6 +17,7 @@
 		"sync-friends": "node scripts/sync-friends-from-notion.js",
 		"migrate-bilingual": "node scripts/migrate-bilingual-posts.js",
 		"migrate-bilingual:check": "node scripts/migrate-bilingual-posts.js --check",
+		"indexnow:submit": "node scripts/submit-indexnow.js",
 		"convert": "python scripts/convert-to-markdown.py",
 		"format": "biome format --write ./src",
 		"lint": "biome check --write ./src"

@@ -2,7 +2,7 @@
 title: '基于Cloudflare Workers构建的类Alist站点-Clist'
 published: 2026-01-16
 description: 'Nodejs环境(20左右)，Cloudflare账号x1，任意PSL域名x1（例如xx.kg，或者dpdns.org这样可以托管到cf的二级域名也行）'
-image: '../assets/images/基于cloudflare-workers构建的类alist站点-clist/cover.jpg'
+image: ''
 tags: ["Tech"]
 draft: false
 lang: ''

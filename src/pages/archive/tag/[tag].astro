@@ -24,8 +24,11 @@ export async function getStaticPaths() {
 }
 
 const tag = Astro.params.tag as string;
+const pageTitle = `${tag} 相关文章归档`;
+const pageDescription = `浏览潮思Chaosyn中关于「${tag}」的中文技术文章，涵盖实践教程、问题排查、项目经验与学习笔记。`;
 ---
 
-<MainGridLayout title={`${tag} - ${t("common.tags", locale)}`} description={`${t("archive.title", locale)} - ${tag}`} hideSidebar={true}>
+<MainGridLayout title={pageTitle} description={pageDescription} hideSidebar={true}>
+	<h1 class="sr-only">{pageTitle}</h1>
 	<ArchivePanel tags={[tag]} locale={locale}></ArchivePanel>
 </MainGridLayout>

@@ -6,6 +6,7 @@
 		"dev": "astro dev",
 		"start": "astro dev",
 		"build": "pnpm run sync-notion && astro build",
+		"postbuild": "pnpm run indexnow:submit || echo IndexNow submit skipped",
 		"preview": "astro preview",
 		"astro": "astro",
 		"type-check": "tsc --noEmit --isolatedDeclarations",

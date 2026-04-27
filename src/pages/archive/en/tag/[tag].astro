@@ -19,8 +19,11 @@ export async function getStaticPaths() {
 }
 
 const tag = Astro.params.tag as string;
+const pageTitle = `${tag} Articles Archive`;
+const pageDescription = `Browse English posts about ${tag} on Chaosyn, including practical tutorials, project notes, troubleshooting guides, and technical experiments.`;
 ---
 
-<MainGridLayout title={`${tag} - ${t("common.tags", locale)}`} description={`${t("archive.title", locale)} - ${tag}`} hideSidebar={true} lang={locale}>
+<MainGridLayout title={pageTitle} description={pageDescription} hideSidebar={true} lang={locale}>
+	<h1 class="sr-only">{pageTitle}</h1>
 	<ArchivePanel tags={[tag]} locale={locale}></ArchivePanel>
 </MainGridLayout>

@@ -35,8 +35,9 @@ if (!book) {
 
 const { Content, headings } = await chapter.render();
 const allChapters = await getBookChapters(bookSlug);
+const chapterDescription = `${chapter.title} 是《${book.title}》的第 ${chapter.order} 章，收录于潮思Chaosyn图书与长篇阅读栏目。${book.description}`;
 ---
-<MainGridLayout title={`${chapter.title} - ${book.title}`} description={book.description} headings={headings} hideSidebar={true}>
+<MainGridLayout title={`${chapter.title} - ${book.title}`} description={chapterDescription} headings={headings} hideSidebar={true}>
 	<div class="flex gap-4 w-full items-start">
 		<!-- 左侧目录侧边栏 - 常驻显示 -->
 		<aside class="hidden lg:block flex-shrink-0 w-64 xl:w-72">

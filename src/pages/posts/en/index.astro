@@ -7,8 +7,11 @@ import { t } from "../../../i18n";
 const locale = "en";
 const posts = await getSortedPosts(locale);
 const page = { data: posts };
+const pageTitle = "English Blog Posts";
+const pageDescription = "Read English posts from Chaosyn about Serverless architecture, Cloudflare, AI applications, frontend engineering, crawlers, and practical troubleshooting.";
 ---
 
-<MainGridLayout title={t("nav.home", locale)} hideSidebar={true} lang={locale}>
+<MainGridLayout title={pageTitle} description={pageDescription} hideSidebar={true} lang={locale}>
+	<h1 class="sr-only">{pageTitle}</h1>
 	<PostPage page={page} locale={locale}></PostPage>
 </MainGridLayout>

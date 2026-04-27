@@ -5,9 +5,12 @@ import MainGridLayout from "@layouts/MainGridLayout.astro";
 import { t, getCurrentLocale } from "../../i18n";
 
 const locale = getCurrentLocale();
+const pageTitle = "文章归档";
+const pageDescription = "浏览潮思Chaosyn全部中文博客文章，按年份整理 Serverless、AI 应用开发、前端、爬虫与学习方法等技术内容。";
 ---
 
-<MainGridLayout title={t("archive.title", locale)} hideSidebar={true}>
+<MainGridLayout title={pageTitle} description={pageDescription} hideSidebar={true}>
+	<h1 class="sr-only">{pageTitle}</h1>
     <ArchivePanel locale={locale}></ArchivePanel>
 </MainGridLayout>
 

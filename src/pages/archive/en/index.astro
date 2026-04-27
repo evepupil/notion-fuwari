@@ -4,8 +4,11 @@ import MainGridLayout from "@layouts/MainGridLayout.astro";
 import { t } from "../../../i18n";
 
 const locale = "en";
+const pageTitle = "Article Archive";
+const pageDescription = "Browse all English posts on Chaosyn, including Serverless, Cloudflare, AI applications, frontend development, crawlers, and troubleshooting notes.";
 ---
 
-<MainGridLayout title={t("archive.title", locale)} hideSidebar={true} lang={locale}>
+<MainGridLayout title={pageTitle} description={pageDescription} hideSidebar={true} lang={locale}>
+	<h1 class="sr-only">{pageTitle}</h1>
 	<ArchivePanel locale={locale}></ArchivePanel>
 </MainGridLayout>

@@ -1,6 +1,28 @@
 .custom-md {
+    /* 正文标题：display 字体 + 平衡换行 + 锚点滚动留白（避开顶部导航） */
+    h1, h2, h3, h4, h5, h6 {
+        font-family: var(--font-display);
+        text-wrap: balance;
+        @apply scroll-mt-24;
+    }
     h1 {
         @apply text-3xl;
+        letter-spacing: -0.01em;
+    }
+
+    /* 正文段落：更舒展的行距，pretty 避免末行孤字，更适合中文阅读 */
+    p {
+        line-height: 1.85;
+        text-wrap: pretty;
+    }
+    li {
+        line-height: 1.8;
+    }
+
+    /* 内容图片：圆角 + 柔和阴影，与卡片质感一致 */
+    img {
+        @apply rounded-xl;
+        box-shadow: var(--shadow-card);
     }
 
     h1, h2, h3, h4, h5, h6 {
@@ -125,7 +147,7 @@
         font-weight: inherit;
 
         &:before {
-            @apply content-[''] absolute -left-1 block transition bg-[var(--btn-regular-bg)] h-full w-1 rounded-full;
+            @apply content-[''] absolute -left-1 block transition bg-[var(--primary-accent)] h-full w-1 rounded-full;
         }
 
         /* Remove the double quotes from default styles */

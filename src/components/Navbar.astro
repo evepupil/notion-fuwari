@@ -114,22 +114,24 @@ let links: NavBarLink[] = navBarConfig.links.map(
     <div class="absolute h-8 left-0 right-0 -top-8 bg-[var(--card-bg)] transition"></div> <!-- used for onload animation -->
     <div class:list={[
         className,
-        "card-base !overflow-visible max-w-[var(--page-width)] h-[4.5rem] !rounded-t-none mx-auto flex items-center justify-between px-4"]}>
+        "card-base !overflow-visible !border-x-0 !border-t-0 max-w-[var(--page-width)] h-[4.5rem] !rounded-t-none mx-auto flex items-center justify-between px-4"]}>
         <a href={url(localizeNavPath('/', navLocale))} data-nav-path="/" class="btn-plain scale-animation rounded-lg h-[3.25rem] px-5 font-bold active:scale-95">
-            <div class="flex flex-row text-[var(--primary)] items-center text-md">
+            <div class="flex flex-row text-[var(--primary)] items-center text-md font-display">
                 <Icon name="material-symbols:home-outline-rounded" class="text-[1.75rem] mb-1 mr-2" />
                 {siteConfig.title}
             </div>
         </a>
         <div class="hidden md:flex">
             {(() => {
+                const activePath = normalizeInternalNavPath(currentPathname);
                 return links.map((l) => {
                     const dataKey = l.external
                         ? getExternalNavI18nKey(l.url) || l.name
                         : getNavI18nKeyByPath(l.url) || l.name;
+                    const isActive = !l.external && normalizeInternalNavPath(l.url) === activePath;
                     return (
                         <a aria-label={l.name} href={l.external ? l.url : url(localizeNavPath(l.url, navLocale))} target={l.external ? "_blank" : null}
-                          class="btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95"
+                          class:list={["btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95", {"text-[var(--primary)] before:!scale-100 before:!bg-[var(--btn-plain-bg-hover)]": isActive}]}
                           data-i18n-key={dataKey}
                           data-nav-path={l.external ? undefined : l.url}
                         >

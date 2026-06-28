@@ -1,8 +1,5 @@
 ---
 import Analytics from "@vercel/analytics/astro";
-import "@fontsource/roboto/400.css";
-import "@fontsource/roboto/500.css";
-import "@fontsource/roboto/700.css";
 
 import {
 	aiChatConfig,
@@ -134,6 +131,13 @@ const alternateLinks = alternates.filter(
 		<title>{pageTitle}</title>
 
 		<meta charset="UTF-8" />
+
+		<!-- 字体：拉丁 Hanken Grotesk + 中文 Noto Sans SC（思源黑体）。display=swap 不阻塞渲染；
+		     大陆访客若加载慢，可把下面 fonts.googleapis.com / fonts.gstatic.com 换成国内镜像 -->
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+
 		<meta name="description" content={description}>
 		<meta name="author" content={profileConfig.name}>
 		{siteConfig.keywords && (

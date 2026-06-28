@@ -15,8 +15,8 @@ const className = Astro.props.class;
 const locale = getCurrentLocale();
 ---
 <widget-layout data-id={id} data-is-collapsed={String(isCollapsed)} class={"pb-4 card-base " + className} style={style}>
-    <div class="font-bold transition text-lg text-neutral-900 dark:text-neutral-100 relative ml-8 mt-4 mb-2
-        before:w-1 before:h-4 before:rounded-md before:bg-[var(--primary)]
+    <div class="font-display font-bold transition text-lg text-neutral-900 dark:text-neutral-100 relative ml-8 mt-4 mb-2
+        before:w-1 before:h-4 before:rounded-full before:bg-[var(--primary-accent)]
         before:absolute before:left-[-16px] before:top-[5.5px]">{name}</div>
     <div id={id} class:list={["collapse-wrapper px-4 overflow-hidden", {"collapsed": isCollapsed}]}>
         <slot></slot>

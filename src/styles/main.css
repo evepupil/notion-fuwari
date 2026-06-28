@@ -1,14 +1,67 @@
 @tailwind components;
 
+/* ===========================================================================
+   设计令牌（精致化新增）
+   说明：放在已确认会被打包的 main.css 里，用纯 CSS 写带透明度/逗号的值，
+   避免 Stylus 对 oklch( / alpha) 与多层 box-shadow 的解析坑。
+   --hue 由主题脚本写在 <html> 行内，:root 处可正常取用。
+   =========================================================================== */
+:root {
+    /* 圆角档位（--radius-large 仍在 variables.styl 定义为 1rem） */
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+
+    /* 字体：拉丁 Hanken Grotesk + 中文思源黑体，叠高质量系统字体栈兜底 */
+    --font-sans: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, "PingFang SC",
+        "HarmonyOS Sans SC", "Noto Sans SC", "Microsoft YaHei", "Segoe UI", "Helvetica Neue",
+        Arial, sans-serif;
+    --font-display: var(--font-sans);
+    --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, Monaco,
+        Consolas, "Liberation Mono", "Courier New", monospace;
+
+    /* 卡片描边 + 柔和的、带主色微调的多层阴影 */
+    --card-border: oklch(0.91 0.012 var(--hue) / 0.85);
+    --shadow-card: 0 1px 2px -1px oklch(0.55 0.05 var(--hue) / 0.10),
+        0 4px 14px -4px oklch(0.55 0.06 var(--hue) / 0.10);
+    --shadow-card-hover: 0 6px 16px -6px oklch(0.55 0.06 var(--hue) / 0.16),
+        0 14px 32px -10px oklch(0.55 0.07 var(--hue) / 0.16);
+    --shadow-float: 0 12px 40px -8px oklch(0.50 0.06 var(--hue) / 0.22);
+
+    /* 更鲜活的强调蓝，专供装饰性竖条/分隔用，正文 --primary 保持不变 */
+    --primary-accent: oklch(0.62 0.13 var(--hue));
+}
+:root.dark {
+    --card-border: oklch(0.42 0.015 var(--hue) / 0.45);
+    --shadow-card: 0 1px 2px -1px rgba(0, 0, 0, 0.5), 0 4px 14px -4px rgba(0, 0, 0, 0.45);
+    --shadow-card-hover: 0 6px 16px -6px rgba(0, 0, 0, 0.6),
+        0 14px 32px -10px rgba(0, 0, 0, 0.5);
+    --shadow-float: 0 12px 40px -8px rgba(0, 0, 0, 0.7);
+    --primary-accent: oklch(0.72 0.12 var(--hue));
+}
+
 @layer components {
     .card-base {
         @apply rounded-[var(--radius-large)] overflow-hidden bg-[var(--card-bg)] transition;
+        border: 1px solid var(--card-border);
+        box-shadow: var(--shadow-card);
     }
     h1, h2, h3, h4, h5, h6, p, a, span, li, ul, ol, blockquote, code, pre, table, th, td, strong {
         @apply transition;
     }
     .card-shadow {
-        @apply drop-shadow-[0_2px_4px_rgba(0,0,0,0.005)]
+        box-shadow: var(--shadow-card);
+    }
+    /* 可交互卡片：悬停时轻微抬升 + 阴影加深，给首页文章卡用。
+       !important 用来盖过 onload-animation（fill-mode forwards 会锁住终态 transform） */
+    .card-hover {
+        @apply transition-all duration-300 ease-out;
+    }
+    .card-hover:hover {
+        box-shadow: var(--shadow-card-hover);
+        transform: translateY(-3px) !important;
+    }
+    .card-hover:active {
+        transform: translateY(-1px) !important;
     }
     .expand-animation {
         @apply relative before:ease-out before:transition active:bg-none hover:before:bg-[var(--btn-plain-bg-hover)] active:before:bg-[var(--btn-plain-bg-active)] z-0
@@ -21,7 +74,9 @@
         @apply transition rounded-md p-1.5 -m-1.5 expand-animation;
     }
     .float-panel {
-        @apply top-[5.25rem] rounded-[var(--radius-large)] overflow-hidden bg-[var(--float-panel-bg)] transition shadow-xl dark:shadow-none
+        @apply top-[5.25rem] rounded-[var(--radius-large)] overflow-hidden bg-[var(--float-panel-bg)] transition;
+        border: 1px solid var(--card-border);
+        box-shadow: var(--shadow-float);
     }
     .float-panel-closed {
         @apply -translate-y-1 opacity-0 pointer-events-none

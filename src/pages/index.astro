@@ -1,0 +1,32 @@
+---
+import HomeHero from "../components/home/HomeHero.astro";
+import MainGridLayout from "../layouts/MainGridLayout.astro";
+import { getSortedPosts } from "../utils/content-utils";
+
+const posts = await getSortedPosts("zh-CN");
+const pinnedPosts = posts.filter((entry) => entry.data.pinned === true);
+const featuredPosts = [
+	...pinnedPosts,
+	...posts.filter((entry) => entry.data.pinned !== true),
+].slice(0, 3);
+
+const tags = Array.from(
+	posts
+		.flatMap((entry) => entry.data.tags || [])
+		.reduce((counts, tag) => {
+			counts.set(tag, (counts.get(tag) || 0) + 1);
+			return counts;
+		}, new Map<string, number>()),
+)
+	.sort((a, b) => b[1] - a[1])
+	.slice(0, 8)
+	.map(([name, count]) => ({ name, count }));
+
+const pageTitle = "首页";
+const pageDescription =
+	"潮思Chaosyn的首页，记录 Serverless、AI 应用开发、认知科学、学习方法与前端工程实践。";
+---
+
+<MainGridLayout title={pageTitle} description={pageDescription} hideSidebar={true}>
+	<HomeHero featuredPosts={featuredPosts} tags={tags} />
+</MainGridLayout>

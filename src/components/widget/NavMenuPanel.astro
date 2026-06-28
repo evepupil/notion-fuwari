@@ -20,7 +20,10 @@ function ensureTrailingSlash(path: string): string {
 function localizeNavPath(path: string, targetLocale: "zh-CN" | "en"): string {
 	const normalized = path === "/" ? "/" : path.replace(/\/+$/, "");
 
-	if (normalized === "/" || normalized === "/posts" || normalized === "/posts/en") {
+	if (normalized === "/") {
+		return "/";
+	}
+	if (normalized === "/posts" || normalized === "/posts/en") {
 		return targetLocale === "en" ? "/posts/en/" : "/posts/";
 	}
 	if (normalized === "/archive" || normalized === "/archive/en") {
@@ -28,13 +31,17 @@ function localizeNavPath(path: string, targetLocale: "zh-CN" | "en"): string {
 	}
 	if (normalized.startsWith("/archive/tag/")) {
 		return targetLocale === "en"
-			? ensureTrailingSlash(normalized.replace("/archive/tag/", "/archive/en/tag/"))
+			? ensureTrailingSlash(
+					normalized.replace("/archive/tag/", "/archive/en/tag/"),
+				)
 			: ensureTrailingSlash(normalized);
 	}
 	if (normalized.startsWith("/archive/en/tag/")) {
 		return targetLocale === "en"
 			? ensureTrailingSlash(normalized)
-			: ensureTrailingSlash(normalized.replace("/archive/en/tag/", "/archive/tag/"));
+			: ensureTrailingSlash(
+					normalized.replace("/archive/en/tag/", "/archive/tag/"),
+				);
 	}
 	if (normalized === "/about" || normalized === "/about/en") {
 		return targetLocale === "en" ? "/about/en/" : "/about/";
@@ -60,7 +67,8 @@ function normalizeInternalNavPath(path: string): string {
 
 function getNavI18nKeyByPath(path: string): string | undefined {
 	const normalizedPath = normalizeInternalNavPath(path);
-	if (normalizedPath === "/" || normalizedPath === "/posts") return "nav.blog";
+	if (normalizedPath === "/") return "nav.home";
+	if (normalizedPath === "/posts") return "nav.blog";
 	if (normalizedPath === "/books") return "nav.books";
 	if (normalizedPath === "/archive") return "nav.archive";
 	if (normalizedPath === "/about") return "nav.about";
@@ -83,11 +91,10 @@ function getExternalNavI18nKey(url: string): string | undefined {
             return (
                 <a href={link.external ? link.url : url(localizeNavPath(link.url, locale))} class="group flex justify-between items-center py-2 pl-3 pr-1 rounded-lg gap-8
                     hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] transition
-                "
-                   target={link.external ? "_blank" : null}
-                   data-i18n-key={dataKey}
-                   data-nav-path={link.external ? undefined : link.url}
-                >
+									"
+									target={link.external ? "_blank" : null}
+									data-nav-path={link.external ? undefined : link.url}
+								>
                     <div class="transition text-black/75 dark:text-white/75 font-bold group-hover:text-[var(--primary)] group-active:text-[var(--primary)]" data-i18n-key={dataKey}>
                         {link.name}
                     </div>

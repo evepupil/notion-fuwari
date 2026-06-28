@@ -1,5 +1,5 @@
 import type {
-    ExpressiveCodeConfig,
+	ExpressiveCodeConfig,
 	GitHubEditConfig,
 	ImageFallbackConfig,
 	LicenseConfig,
@@ -79,6 +79,11 @@ export const siteConfig: SiteConfig = {
 export const navBarConfig: NavBarConfig = {
 	links: [
 		LinkPreset.Home,
+		{
+			name: "博客",
+			url: "/posts/",
+			external: false,
+		},
 		LinkPreset.Archive,
 		{
 			name: "图书",
@@ -143,16 +148,18 @@ export const expressiveCodeConfig: ExpressiveCodeConfig = {
 
 export const gitHubEditConfig: GitHubEditConfig = {
 	enable: true,
-	baseUrl: "https://github.com/evepupil/notion-fuwari/blob/master/src/content/posts",
+	baseUrl:
+		"https://github.com/evepupil/notion-fuwari/blob/master/src/content/posts",
 };
-
 
 export const statsConfig = {
 	viewsText: "浏览",
 	visitsText: "访客",
 	loadingText: "统计加载中...",
-	unavailableText: "统计不可用。请检查是否屏蔽了Umami域名，如AdGuard和AdBlock等插件",
-	getStatsText: (pageViews: number, visits: number) => `${statsConfig.viewsText} ${pageViews} · ${statsConfig.visitsText} ${visits}`,
+	unavailableText:
+		"统计不可用。请检查是否屏蔽了Umami域名，如AdGuard和AdBlock等插件",
+	getStatsText: (pageViews: number, visits: number) =>
+		`${statsConfig.viewsText} ${pageViews} · ${statsConfig.visitsText} ${visits}`,
 };
 
 // 分析和广告配置

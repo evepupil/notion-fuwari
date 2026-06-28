@@ -9,6 +9,7 @@ export const zhCN = {
 		about: "关于",
 		friends: "友链",
 		sponsors: "赞助",
+		statistics: "统计",
 	},
 
 	// 通用

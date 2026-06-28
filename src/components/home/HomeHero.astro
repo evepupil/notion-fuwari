@@ -1,0 +1,505 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { Icon } from "astro-icon/components";
+import { profileConfig } from "../../config";
+import { getPostUrlBySlugAndLang } from "../../utils/url-utils";
+
+interface TagSummary {
+	name: string;
+	count: number;
+}
+
+interface Props {
+	featuredPosts: CollectionEntry<"posts">[];
+	tags: TagSummary[];
+}
+
+const { featuredPosts, tags } = Astro.props;
+const avatarSrc = profileConfig.avatars?.[0] || profileConfig.avatar || "";
+const heroTags = tags.slice(0, 5);
+const primaryPost = featuredPosts[0];
+const secondaryPosts = featuredPosts.slice(1, 3);
+
+const formatDate = (date: Date) =>
+	new Intl.DateTimeFormat("zh-CN", {
+		year: "numeric",
+		month: "numeric",
+		day: "numeric",
+	}).format(date);
+---
+
+<section class="home-shell" aria-labelledby="home-title">
+	<div class="home-hero">
+		<div class="home-copy">
+			<p class="home-kicker">CHAOSYN LAB / YE TONG</p>
+			<h1 id="home-title">
+				<span>探索</span>
+				<span>未来与认知</span>
+			</h1>
+			<div class="wave-line" aria-hidden="true"></div>
+			<p class="home-description">
+				这是一个关于 Serverless、AI 应用开发、认知科学与学习方法的数字实验室。
+			</p>
+			<div class="home-actions">
+				<a href="/posts/" class="home-primary-link">阅读博客</a>
+				<a href="/archive/" class="home-secondary-link">查看归档</a>
+			</div>
+		</div>
+
+		<aside class="home-side" aria-label="站点信息">
+			<div class="profile-card">
+				<img src={avatarSrc} alt={`${profileConfig.name} 的头像`} loading="eager" />
+				<div>
+					<p class="profile-name">{profileConfig.name}</p>
+					<p class="profile-bio">{profileConfig.bio}</p>
+				</div>
+				<div class="profile-links">
+					{profileConfig.links.map((link) => (
+						<a href={link.url} aria-label={link.name} target="_blank" rel="me noopener">
+							<Icon name={link.icon} />
+						</a>
+					))}
+				</div>
+			</div>
+
+			<div class="tag-card">
+				<div class="card-title">
+					<Icon name="material-symbols:search-rounded" />
+					<span>标签</span>
+				</div>
+				<div class="tag-list">
+					{heroTags.map((tag) => (
+						<a href={`/archive/tag/${tag.name}/`} class="tag-pill">
+							#{tag.name}
+							<span>{tag.count}</span>
+						</a>
+					))}
+				</div>
+			</div>
+		</aside>
+	</div>
+
+	{primaryPost && (
+		<div class="featured-grid" aria-label="精选文章">
+			<a href={getPostUrlBySlugAndLang(primaryPost.slug, "zh-CN")} class="featured-primary">
+				<div class="post-badges">
+					{primaryPost.data.pinned && <span>置顶</span>}
+					{primaryPost.data.tags?.[0] && <span>{primaryPost.data.tags[0]}</span>}
+				</div>
+				<time datetime={primaryPost.data.published.toISOString()}>
+					{formatDate(primaryPost.data.published)}
+				</time>
+				<h2>{primaryPost.data.title}</h2>
+				<p>{primaryPost.data.description}</p>
+				<div class="post-footer">
+					<span>阅读全文</span>
+					<Icon name="material-symbols:arrow-forward-rounded" />
+				</div>
+			</a>
+
+			<div class="featured-secondary">
+				{secondaryPosts.map((post) => (
+					<a href={getPostUrlBySlugAndLang(post.slug, "zh-CN")}>
+						<time datetime={post.data.published.toISOString()}>
+							{formatDate(post.data.published)}
+						</time>
+						<h3>{post.data.title}</h3>
+						<p>{post.data.description}</p>
+					</a>
+				))}
+			</div>
+		</div>
+	)}
+</section>
+
+<style>
+	.home-shell {
+		min-height: calc(100vh - 7rem);
+		padding: clamp(4rem, 8vw, 8rem) clamp(1rem, 2vw, 1.5rem) 4rem;
+		color: #303133;
+	}
+
+	:global(body.site-home) {
+		background:
+			radial-gradient(circle at 78% 18%, rgba(127, 168, 170, 0.08), transparent 28rem),
+			linear-gradient(180deg, #f8f5ef 0%, #f4f7f6 55%, #f8f5ef 100%);
+	}
+
+	.home-hero {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(17rem, 20rem);
+		gap: clamp(2rem, 7vw, 8rem);
+		align-items: start;
+	}
+
+	.home-copy {
+		padding-top: clamp(1rem, 5vw, 5rem);
+	}
+
+	.home-kicker {
+		margin: 0 0 1.5rem;
+		color: #8aa9ab;
+		font-size: 0.78rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+	}
+
+	.home-copy h1 {
+		display: grid;
+		gap: 0.25rem;
+		margin: 0;
+		font-family: "Roboto", "Noto Sans SC", system-ui, sans-serif;
+		font-size: clamp(3.6rem, 8vw, 6.8rem);
+		font-weight: 800;
+		line-height: 0.98;
+		letter-spacing: 0;
+		color: #292a2c;
+	}
+
+	.home-copy h1 span:last-child {
+		color: #7fa8aa;
+	}
+
+	.wave-line {
+		width: min(27rem, 100%);
+		height: 0.9rem;
+		margin: 0.45rem 0 2rem;
+		background:
+			radial-gradient(circle at 0.35rem 0.45rem, transparent 0.35rem, #7fa8aa 0.38rem, #7fa8aa 0.46rem, transparent 0.49rem)
+			0 0 / 1.05rem 0.9rem repeat-x;
+		opacity: 0.9;
+	}
+
+	.home-description {
+		max-width: 34rem;
+		margin: 0;
+		color: #777b80;
+		font-size: clamp(1rem, 1.6vw, 1.2rem);
+		font-weight: 500;
+		line-height: 1.9;
+	}
+
+	.home-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.9rem;
+		margin-top: 2rem;
+	}
+
+	.home-actions a {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 2.75rem;
+		padding: 0 1.15rem;
+		border-radius: 999px;
+		font-weight: 700;
+		text-decoration: none;
+		transition: transform 180ms ease, background 180ms ease, color 180ms ease, border-color 180ms ease;
+	}
+
+	.home-actions a:hover {
+		transform: translateY(-2px);
+	}
+
+	.home-primary-link {
+		background: #7fa8aa;
+		color: white;
+		box-shadow: 0 14px 30px rgba(127, 168, 170, 0.25);
+	}
+
+	.home-secondary-link {
+		border: 1px solid rgba(127, 168, 170, 0.35);
+		color: #557577;
+		background: rgba(255, 255, 255, 0.55);
+	}
+
+	.home-side {
+		display: grid;
+		gap: 1.5rem;
+	}
+
+	.profile-card,
+	.tag-card,
+	.featured-primary,
+	.featured-secondary a {
+		border: 1px solid rgba(48, 49, 51, 0.07);
+		background: rgba(255, 255, 255, 0.78);
+		box-shadow: 0 18px 50px rgba(59, 50, 42, 0.07);
+		backdrop-filter: blur(16px);
+	}
+
+	.profile-card,
+	.tag-card {
+		border-radius: 2rem;
+		padding: 1.8rem;
+	}
+
+	.profile-card img {
+		width: 5.2rem;
+		height: 5.2rem;
+		border-radius: 1.2rem;
+		object-fit: cover;
+		box-shadow: 0 0 0 0.45rem rgba(127, 168, 170, 0.1);
+	}
+
+	.profile-name {
+		margin: 1.6rem 0 0.35rem;
+		color: #303133;
+		font-size: 1.35rem;
+		font-weight: 800;
+	}
+
+	.profile-bio {
+		margin: 0;
+		color: #8a8d91;
+		font-size: 0.95rem;
+		font-style: italic;
+	}
+
+	.profile-links {
+		display: flex;
+		gap: 0.9rem;
+		margin-top: 1.2rem;
+	}
+
+	.profile-links a {
+		display: inline-flex;
+		width: 1.65rem;
+		height: 1.65rem;
+		align-items: center;
+		justify-content: center;
+		color: #6f7377;
+		font-size: 1.25rem;
+		transition: color 180ms ease, transform 180ms ease;
+	}
+
+	.profile-links a:hover {
+		color: #7fa8aa;
+		transform: translateY(-2px);
+	}
+
+	.card-title {
+		display: flex;
+		align-items: center;
+		gap: 0.65rem;
+		color: #303133;
+		font-size: 1.05rem;
+		font-weight: 800;
+	}
+
+	.card-title svg {
+		color: #7fa8aa;
+		font-size: 1.2rem;
+	}
+
+	.tag-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		margin-top: 1.2rem;
+	}
+
+	.tag-pill {
+		display: inline-flex;
+		gap: 0.45rem;
+		align-items: center;
+		padding: 0.55rem 0.85rem;
+		border-radius: 999px;
+		background: rgba(243, 244, 244, 0.95);
+		color: #777b80;
+		font-size: 0.85rem;
+		text-decoration: none;
+	}
+
+	.tag-pill span {
+		color: #a5a8ac;
+	}
+
+	.featured-grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem);
+		gap: 1.5rem;
+		margin-top: clamp(3rem, 9vw, 8rem);
+	}
+
+	.featured-primary,
+	.featured-secondary a {
+		position: relative;
+		display: block;
+		border-radius: 1.65rem;
+		color: inherit;
+		text-decoration: none;
+		transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+	}
+
+	.featured-primary {
+		min-height: 15rem;
+		padding: clamp(1.6rem, 3vw, 2.2rem);
+	}
+
+	.featured-primary:hover,
+	.featured-secondary a:hover {
+		border-color: rgba(127, 168, 170, 0.28);
+		box-shadow: 0 22px 60px rgba(59, 50, 42, 0.1);
+		transform: translateY(-3px);
+	}
+
+	.post-badges {
+		display: flex;
+		gap: 0.55rem;
+		margin-bottom: 1.35rem;
+	}
+
+	.post-badges span {
+		padding: 0.35rem 0.65rem;
+		border-radius: 0.45rem;
+		background: rgba(127, 168, 170, 0.14);
+		color: #6f9da0;
+		font-size: 0.75rem;
+		font-weight: 800;
+		text-transform: uppercase;
+	}
+
+	time {
+		color: #a3a6aa;
+		font-size: 0.82rem;
+		font-weight: 700;
+	}
+
+	.featured-primary time {
+		position: absolute;
+		top: 1.8rem;
+		right: 2rem;
+	}
+
+	.featured-primary h2,
+	.featured-secondary h3 {
+		margin: 0.65rem 0 0.9rem;
+		color: #303133;
+		font-weight: 800;
+		line-height: 1.35;
+		letter-spacing: 0;
+	}
+
+	.featured-primary h2 {
+		max-width: 44rem;
+		font-size: clamp(1.7rem, 3vw, 2.45rem);
+	}
+
+	.featured-primary p,
+	.featured-secondary p {
+		color: #777b80;
+		line-height: 1.8;
+	}
+
+	.featured-primary p {
+		max-width: 54rem;
+		margin: 0;
+		font-size: 1rem;
+	}
+
+	.post-footer {
+		display: inline-flex;
+		gap: 0.4rem;
+		align-items: center;
+		margin-top: 2rem;
+		color: #6f9da0;
+		font-weight: 800;
+	}
+
+	.featured-secondary {
+		display: grid;
+		gap: 1rem;
+	}
+
+	.featured-secondary a {
+		padding: 1.25rem;
+	}
+
+	.featured-secondary h3 {
+		font-size: 1.08rem;
+	}
+
+	.featured-secondary p {
+		display: -webkit-box;
+		margin: 0;
+		overflow: hidden;
+		font-size: 0.9rem;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+	}
+
+	:global(html.dark) .home-shell {
+		color: #ededec;
+	}
+
+	:global(html.dark) .home-copy h1,
+	:global(html.dark) .profile-name,
+	:global(html.dark) .card-title,
+	:global(html.dark) .featured-primary h2,
+	:global(html.dark) .featured-secondary h3 {
+		color: #f2f0ed;
+	}
+
+	:global(html.dark) .home-description,
+	:global(html.dark) .profile-bio,
+	:global(html.dark) .featured-primary p,
+	:global(html.dark) .featured-secondary p {
+		color: rgba(242, 240, 237, 0.68);
+	}
+
+	:global(html.dark) .profile-card,
+	:global(html.dark) .tag-card,
+	:global(html.dark) .featured-primary,
+	:global(html.dark) .featured-secondary a {
+		border-color: rgba(255, 255, 255, 0.08);
+		background: rgba(31, 34, 35, 0.78);
+		box-shadow: none;
+	}
+
+	:global(html.dark) .home-secondary-link,
+	:global(html.dark) .tag-pill {
+		background: rgba(255, 255, 255, 0.06);
+	}
+
+	@media (max-width: 900px) {
+		.home-shell {
+			padding-top: 3.5rem;
+		}
+
+		.home-hero,
+		.featured-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.home-side {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		.featured-primary time {
+			position: static;
+		}
+	}
+
+	@media (max-width: 640px) {
+		.home-shell {
+			padding: 2.5rem 1rem 3rem;
+		}
+
+		.home-copy h1 {
+			font-size: clamp(3.05rem, 16vw, 4rem);
+		}
+
+		.home-side {
+			grid-template-columns: 1fr;
+		}
+
+		.profile-card,
+		.tag-card,
+		.featured-primary,
+		.featured-secondary a {
+			border-radius: 1.35rem;
+		}
+	}
+</style>

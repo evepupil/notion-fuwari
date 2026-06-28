@@ -38,7 +38,10 @@ function ensureTrailingSlash(path: string): string {
 function localizeNavPath(path: string, targetLocale: "zh-CN" | "en"): string {
 	const normalized = path === "/" ? "/" : path.replace(/\/+$/, "");
 
-	if (normalized === "/" || normalized === "/posts" || normalized === "/posts/en") {
+	if (normalized === "/") {
+		return "/";
+	}
+	if (normalized === "/posts" || normalized === "/posts/en") {
 		return targetLocale === "en" ? "/posts/en/" : "/posts/";
 	}
 	if (normalized === "/archive" || normalized === "/archive/en") {
@@ -46,13 +49,17 @@ function localizeNavPath(path: string, targetLocale: "zh-CN" | "en"): string {
 	}
 	if (normalized.startsWith("/archive/tag/")) {
 		return targetLocale === "en"
-			? ensureTrailingSlash(normalized.replace("/archive/tag/", "/archive/en/tag/"))
+			? ensureTrailingSlash(
+					normalized.replace("/archive/tag/", "/archive/en/tag/"),
+				)
 			: ensureTrailingSlash(normalized);
 	}
 	if (normalized.startsWith("/archive/en/tag/")) {
 		return targetLocale === "en"
 			? ensureTrailingSlash(normalized)
-			: ensureTrailingSlash(normalized.replace("/archive/en/tag/", "/archive/tag/"));
+			: ensureTrailingSlash(
+					normalized.replace("/archive/en/tag/", "/archive/tag/"),
+				);
 	}
 	if (normalized === "/about" || normalized === "/about/en") {
 		return targetLocale === "en" ? "/about/en/" : "/about/";
@@ -78,7 +85,8 @@ function normalizeInternalNavPath(path: string): string {
 
 function getNavI18nKeyByPath(path: string): string | undefined {
 	const normalizedPath = normalizeInternalNavPath(path);
-	if (normalizedPath === "/" || normalizedPath === "/posts") return "nav.blog";
+	if (normalizedPath === "/") return "nav.home";
+	if (normalizedPath === "/posts") return "nav.blog";
 	if (normalizedPath === "/books") return "nav.books";
 	if (normalizedPath === "/archive") return "nav.archive";
 	if (normalizedPath === "/about") return "nav.about";
@@ -93,8 +101,8 @@ function getExternalNavI18nKey(url: string): string | undefined {
 }
 
 // 搜索框翻译文本
-const searchPlaceholderZh = t('common.search', locale);
-const searchPlaceholderEn = 'Search';
+const searchPlaceholderZh = t("common.search", locale);
+const searchPlaceholderEn = "Search";
 
 let links: NavBarLink[] = navBarConfig.links.map(
 	(item: NavBarLink | LinkPreset): NavBarLink => {
@@ -135,6 +143,7 @@ let links: NavBarLink[] = navBarConfig.links.map(
                           data-i18n-key={dataKey}
                           data-nav-path={l.external ? undefined : l.url}
                         >
+                            {l.name}
                             <div class="flex items-center">
                                 {l.external && <Icon name="fa6-solid:arrow-up-right-from-square" class="text-[0.875rem] transition -translate-y-[1px] ml-1 text-black/[0.2] dark:text-white/[0.2]"></Icon>}
                             </div>
@@ -181,7 +190,11 @@ function loadButtonScript() {
         const normalized = path === "/" ? "/" : path.replace(/\/+$/, "");
         const targetLocale = locale === "en" ? "en" : "zh-CN";
 
-        if (normalized === "/" || normalized === "/posts" || normalized === "/posts/en") {
+        if (normalized === "/") {
+            return "/";
+        }
+
+        if (normalized === "/posts" || normalized === "/posts/en") {
             return targetLocale === "en" ? "/posts/en/" : "/posts/";
         }
 

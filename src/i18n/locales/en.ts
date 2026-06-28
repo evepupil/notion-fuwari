@@ -11,6 +11,7 @@ export const en: TranslationKeys = {
 		about: "About",
 		friends: "Friends",
 		sponsors: "Sponsors",
+		statistics: "Stats",
 	},
 
 	// Common
@@ -69,7 +70,8 @@ export const en: TranslationKeys = {
 		views: "Views",
 		visitors: "Visitors",
 		loading: "Loading stats...",
-		error: "Stats unavailable. Please check if Umami domain is blocked by AdGuard or AdBlock extensions",
+		error:
+			"Stats unavailable. Please check if Umami domain is blocked by AdGuard or AdBlock extensions",
 	},
 
 	// Friends
